@@ -15,7 +15,7 @@ const TYPING_STATES = [
 
 export function TypingIndicator() {
   const [elapsedTime, setElapsedTime] = useState(0)
-  const [currentText, setCurrentText] = useState(TYPING_STATES[0].text)
+  const [currentText, setCurrentText] = useState<string>(TYPING_STATES[0].text)
 
   useEffect(() => {
     // Start timing from when component mounts

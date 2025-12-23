@@ -8,13 +8,6 @@ import type { ChatRequest, ChatResponse, ErrorResponse, APIError } from '@/types
 const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT;
 const STREAMING_ENDPOINT = process.env.NEXT_PUBLIC_STREAMING_ENDPOINT;
 
-if (!API_ENDPOINT) {
-  console.warn('NEXT_PUBLIC_API_ENDPOINT is not set');
-}
-if (!STREAMING_ENDPOINT) {
-  console.warn('NEXT_PUBLIC_STREAMING_ENDPOINT is not set');
-}
-
 /**
  * Streaming response callbacks
  */
@@ -34,6 +27,10 @@ export async function sendMessageStreaming(
   sessionId: string | undefined,
   callbacks: StreamingCallbacks
 ): Promise<void> {
+  if (!STREAMING_ENDPOINT) {
+    throw createAPIError('Streaming endpoint not configured');
+  }
+
   try {
     const requestBody: ChatRequest = { message };
     if (sessionId) {
@@ -118,6 +115,10 @@ export async function sendMessage(
   message: string,
   sessionId?: string
 ): Promise<ChatResponse> {
+  if (!API_ENDPOINT) {
+    throw createAPIError('API endpoint not configured');
+  }
+
   try {
     const requestBody: ChatRequest = {
       message,

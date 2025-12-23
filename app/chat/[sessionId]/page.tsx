@@ -15,10 +15,12 @@ import { EmptyState } from '@/components/chat/empty-state';
 import { sendMessage, sendMessageStreaming, getErrorMessage } from '@/lib/api';
 import { saveConversation as saveToStorage, getConversation as getFromStorage, updateConversationTitle, updateConversationTitleInDB, type Conversation } from '@/lib/session';
 import { useToast } from '@/components/ui/toast';
-import type { Message } from '@/types/api';
-
-// Extended Message type with error handling
-interface UIMessage extends Message {
+// UI Message type for chat display
+interface UIMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
   isError?: boolean;
   errorMessage?: string;
   canRetry?: boolean;

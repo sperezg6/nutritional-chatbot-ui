@@ -14,21 +14,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate PDF buffer (using React.createElement instead of JSX)
-    const pdfBuffer = await renderToBuffer(
-      React.createElement(MealPlanPDF, { content })
-    );
+    // Generate PDF buffer
+    const pdfElement = React.createElement(MealPlanPDF, { content });
+    const pdfBuffer = await renderToBuffer(pdfElement as Parameters<typeof renderToBuffer>[0]);
 
     // Return PDF as blob
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="plan-nutricional-${Date.now()}.pdf"`,
       },
     });
-  } catch (error) {
-    console.error('Error generating PDF:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to generate PDF' },
       { status: 500 }

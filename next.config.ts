@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Set workspace root to this project directory
+  outputFileTracingRoot: __dirname,
   // Security headers
   async headers() {
     return [

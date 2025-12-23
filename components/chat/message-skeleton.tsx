@@ -17,7 +17,7 @@ interface MessageSkeletonProps {
 }
 
 export function MessageSkeleton({ lines = 3 }: MessageSkeletonProps) {
-  const [currentText, setCurrentText] = useState(LOADING_STATES[0].text)
+  const [currentText, setCurrentText] = useState<string>(LOADING_STATES[0].text)
 
   useEffect(() => {
     const startTime = Date.now()

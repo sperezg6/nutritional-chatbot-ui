@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/toast"
 
 interface UIMessage {
   id: string
-  role: 'user' | 'assistant' | 'system'
+  role: 'user' | 'assistant'
   content: string
   timestamp: Date
   isError?: boolean
