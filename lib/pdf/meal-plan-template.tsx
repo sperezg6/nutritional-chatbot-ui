@@ -307,45 +307,106 @@ export function MealPlanPDF({ content }: MealPlanPDFProps) {
     let currentMeal: Meal | null = null;
     let inNotes = false;
 
+    // Helper to clean text (remove markdown bold, emojis, variation selectors, etc.)
+    const cleanText = (text: string): string => {
+      return text
+        .replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{FE00}-\u{FE0F}]/gu, '')
+        .replace(/\*\*/g, '')
+        .replace(/^#+\s*/, '')
+        .replace(/^-\s*/, '')
+        .trim();
+    };
+
+    // Helper to detect if a line is a day header
+    const isDayHeader = (line: string): boolean => {
+      const lower = cleanText(line).toLowerCase();
+      // Match patterns like: "Día 1", "día 1 - lunes", "**Día 1**", "### Día 1"
+      return /d[íi]a\s*\d|d[íi]a\s+[a-z]+/i.test(lower) ||
+             /(lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado|domingo)/i.test(lower);
+    };
+
+    // Helper to detect meal headers
+    const mealNames = ['desayuno', 'comida', 'almuerzo', 'cena', 'colación', 'colaciones', 'snack', 'refrigerio', 'media mañana', 'media tarde', 'merienda'];
+    const isMealHeader = (text: string): boolean => {
+      const lower = cleanText(text).toLowerCase();
+      return mealNames.some(m => lower.startsWith(m) || lower === m);
+    };
+
+    // Helper to detect section headers (not inline bold text like **Ingredientes:**)
+    const isSectionHeader = (line: string): boolean => {
+      if (line.startsWith('#')) return true;
+      // Only treat ** as section header if it's a standalone bold title, not inline content
+      if (line.startsWith('**')) {
+        const lower = line.toLowerCase();
+        // These are inline content, not section headers
+        if (lower.includes('ingredientes:') || lower.includes('nutrición') || lower.includes('sodio')) {
+          return false;
+        }
+        return true;
+      }
+      return false;
+    };
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
 
-      // Remove emojis for matching
-      const cleanLine = line.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/gu, '').trim();
+      const cleanLine = cleanText(line);
+      const lowerClean = cleanLine.toLowerCase();
 
-      // Main title
-      if (line.startsWith('## ') && cleanLine.toLowerCase().includes('plan')) {
-        plan.title = cleanLine.replace('## ', '').trim();
-        currentSection = 'title';
-      }
-      // Patient info section
-      else if (line.startsWith('## ') && (cleanLine.toLowerCase().includes('información') || cleanLine.toLowerCase().includes('informacion'))) {
-        currentSection = 'info';
-      }
-      // Limits section
-      else if (line.startsWith('## ') && cleanLine.toLowerCase().includes('límite')) {
-        currentSection = 'limits';
-      }
-      // Week/Day sections
-      else if (line.startsWith('## ') && (cleanLine.toLowerCase().includes('semana') || cleanLine.toLowerCase().includes('plan'))) {
-        currentSection = 'meals';
-      }
-      // Day header (### Día X)
-      else if (line.startsWith('### ') && cleanLine.toLowerCase().includes('día')) {
+      // Detect day headers - support multiple formats:
+      // "### Día 1", "**Día 1**", "Día 1:", "#### Día 1 - Lunes"
+      if (isDayHeader(line) && (isSectionHeader(line) || /^d[íi]a/i.test(cleanLine))) {
+        // Save previous day
         if (currentDay) {
           if (currentMeal) currentDay.meals.push(currentMeal);
           plan.days.push(currentDay);
         }
         currentDay = {
-          name: cleanLine.replace('### ', '').trim(),
+          name: cleanLine.replace(/:$/, ''),
           meals: [],
         };
         currentMeal = null;
         currentSection = 'meals';
+        continue;
+      }
+
+      // Detect meal headers - support:
+      // "#### Desayuno", "**Desayuno:**", "- **Desayuno**", "Desayuno:", "🌅 Desayuno"
+      if (isMealHeader(cleanLine) && isSectionHeader(line)) {
+        // If no day exists yet, create a default "Día 1" for single-day plans
+        if (!currentDay) {
+          currentDay = {
+            name: 'Día 1',
+            meals: [],
+          };
+          currentSection = 'meals';
+        }
+        if (currentMeal) {
+          currentDay.meals.push(currentMeal);
+        }
+        currentMeal = {
+          name: cleanLine.replace(/:$/, ''),
+          items: [],
+        };
+        continue;
+      }
+
+      // Main title detection
+      if (isSectionHeader(line) && lowerClean.includes('plan') && !currentDay) {
+        plan.title = cleanLine;
+        currentSection = 'title';
+      }
+      // Patient info section
+      else if (isSectionHeader(line) && (lowerClean.includes('información') || lowerClean.includes('informacion') || lowerClean.includes('datos del paciente'))) {
+        currentSection = 'info';
+      }
+      // Limits section
+      else if (isSectionHeader(line) && (lowerClean.includes('límite') || lowerClean.includes('limite') || lowerClean.includes('recomendaciones nutricionales'))) {
+        currentSection = 'limits';
       }
       // Notes/Reminder section
-      else if (line.startsWith('## ') && (cleanLine.toLowerCase().includes('recordatorio') || cleanLine.toLowerCase().includes('nota'))) {
+      else if (isSectionHeader(line) && (lowerClean.includes('recordatorio') || lowerClean.includes('nota') || lowerClean.includes('importante') || lowerClean.includes('recomendaciones generales'))) {
         if (currentDay) {
           if (currentMeal) currentDay.meals.push(currentMeal);
           plan.days.push(currentDay);
@@ -355,12 +416,16 @@ export function MealPlanPDF({ content }: MealPlanPDFProps) {
         currentSection = 'notes';
         inNotes = true;
       }
-      // List items
-      else if (line.startsWith('- ')) {
-        const itemText = line.substring(2).replace(/\*\*/g, '').trim();
+      // Week/Plan sections
+      else if (isSectionHeader(line) && (lowerClean.includes('semana') || lowerClean.includes('menú'))) {
+        currentSection = 'meals';
+      }
+      // List items (starting with - or *)
+      else if (/^[-*]\s/.test(line)) {
+        const itemText = cleanText(line);
+        const lowerItem = itemText.toLowerCase();
 
         if (currentSection === 'info') {
-          // Parse "Key: Value" format
           const colonIdx = itemText.indexOf(':');
           if (colonIdx > 0) {
             plan.patientInfo.push({
@@ -381,41 +446,66 @@ export function MealPlanPDF({ content }: MealPlanPDFProps) {
         else if (currentSection === 'notes' || inNotes) {
           plan.notes.push(itemText);
         }
-        else if (currentSection === 'meals' && currentDay) {
-          // Check if this is a meal name (Desayuno, Comida, Cena, Colaciones)
-          const mealNames = ['desayuno', 'comida', 'almuerzo', 'cena', 'colación', 'colaciones', 'snack', 'refrigerio'];
-          const lowerItem = itemText.toLowerCase();
-          const isMealName = mealNames.some(m => lowerItem.startsWith(m) || lowerItem === m);
-
-          if (isMealName) {
-            // Save previous meal
-            if (currentMeal) {
-              currentDay.meals.push(currentMeal);
-            }
-            currentMeal = {
-              name: itemText,
-              items: [],
-            };
-          } else if (currentMeal) {
-            // Check if it's a nutrition line
-            if (lowerItem.includes('nutrición') || lowerItem.includes('sodio')) {
-              currentMeal.nutrition = itemText;
-            } else {
-              currentMeal.items.push(itemText);
-            }
+        else if (currentMeal) {
+          // Add item to current meal
+          if (lowerItem.includes('nutrición') || lowerItem.includes('sodio') || lowerItem.includes('kcal')) {
+            currentMeal.nutrition = itemText;
+          } else if (itemText) {
+            currentMeal.items.push(itemText);
           }
         }
+        else if (currentDay && isMealHeader(itemText)) {
+          // Meal name as list item
+          if (currentMeal) {
+            currentDay.meals.push(currentMeal);
+          }
+          currentMeal = {
+            name: itemText.replace(/:$/, ''),
+            items: [],
+          };
+        }
       }
-      // Nested list items (meal details)
-      else if (line.startsWith('  - ') || line.startsWith('    - ')) {
-        const itemText = line.replace(/^\s+-\s*/, '').replace(/\*\*/g, '').trim();
-        if (currentMeal) {
-          const lowerItem = itemText.toLowerCase();
-          if (lowerItem.includes('nutrición') || lowerItem.includes('sodio')) {
+      // Nested list items or indented content
+      else if (/^\s+[-*]\s/.test(line) || /^\s{2,}/.test(line)) {
+        const itemText = cleanText(line);
+        const lowerItem = itemText.toLowerCase();
+        if (currentMeal && itemText) {
+          if (lowerItem.includes('nutrición') || lowerItem.includes('sodio') || lowerItem.includes('kcal')) {
             currentMeal.nutrition = itemText;
           } else {
             currentMeal.items.push(itemText);
           }
+        }
+      }
+      // Sub-headers (recipe names) after meal headers - e.g., "### Claras de huevo..."
+      else if (currentMeal && line.startsWith('###') && !isMealHeader(cleanLine) && !isDayHeader(line)) {
+        // This is a recipe name, add it as first item
+        if (cleanLine.length > 3) {
+          currentMeal.items.unshift(cleanLine);
+        }
+      }
+      // Plain text after meal header (for formats without list items)
+      else if (currentMeal && !isSectionHeader(line) && cleanLine) {
+        // Handle inline ingredients and nutrition
+        const lowerLine = cleanLine.toLowerCase();
+        if (lowerLine.includes('ingredientes:') || lowerLine.includes('nutrición')) {
+          // Parse inline content with bold markers
+          const parts = cleanLine.split(/\*\*/).filter(p => p.trim());
+          for (const part of parts) {
+            const trimmed = part.trim();
+            if (trimmed.toLowerCase().includes('nutrición') || trimmed.toLowerCase().includes('sodio')) {
+              currentMeal.nutrition = trimmed.replace(/^[:\s]+/, '');
+            } else if (trimmed.toLowerCase().includes('ingredientes')) {
+              // Skip the label "Ingredientes:"
+              continue;
+            } else if (trimmed.length > 5) {
+              currentMeal.items.push(trimmed.replace(/^[:\s]+/, ''));
+            }
+          }
+        }
+        // Skip lines that look like headers or are very short
+        else if (cleanLine.length > 5 && !cleanLine.endsWith(':')) {
+          currentMeal.items.push(cleanLine);
         }
       }
     }

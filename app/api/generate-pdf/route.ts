@@ -26,9 +26,10 @@ export async function POST(request: NextRequest) {
         'Content-Disposition': `attachment; filename="plan-nutricional-${Date.now()}.pdf"`,
       },
     });
-  } catch {
+  } catch (error) {
+    console.error('PDF generation error:', error);
     return NextResponse.json(
-      { error: 'Failed to generate PDF' },
+      { error: 'Failed to generate PDF', details: String(error) },
       { status: 500 }
     );
   }

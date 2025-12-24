@@ -31,11 +31,19 @@ export function DottedSurface({
       0.1,
       1000
     )
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      alpha: true,
-      antialias: true,
-    })
+
+    let renderer: THREE.WebGLRenderer
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+        powerPreference: 'low-power',
+      })
+    } catch {
+      console.warn('WebGL not available')
+      return
+    }
 
     renderer.setSize(window.innerWidth, window.innerHeight)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -84,8 +92,13 @@ export function DottedSurface({
 
     // Animation
     let time = 0
+    let animationFrameId: number
+    let isDisposed = false
+
     const animate = () => {
-      requestAnimationFrame(animate)
+      if (isDisposed) return
+
+      animationFrameId = requestAnimationFrame(animate)
 
       time += 0.01 * speed
       const positions = geometry.attributes.position.array as Float32Array
@@ -108,6 +121,7 @@ export function DottedSurface({
 
     // Handle resize
     const handleResize = () => {
+      if (isDisposed) return
       camera.aspect = window.innerWidth / window.innerHeight
       camera.updateProjectionMatrix()
       renderer.setSize(window.innerWidth, window.innerHeight)
@@ -116,7 +130,10 @@ export function DottedSurface({
     window.addEventListener('resize', handleResize)
 
     return () => {
+      isDisposed = true
+      cancelAnimationFrame(animationFrameId)
       window.removeEventListener('resize', handleResize)
+      scene.remove(points)
       geometry.dispose()
       material.dispose()
       renderer.dispose()
