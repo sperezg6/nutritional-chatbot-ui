@@ -59,6 +59,18 @@ const allPrompts = [
   "Recetas sin sal",
   "Alimentos ricos en hierro",
   "¿Qué verduras son seguras?",
+
+  // Educational - kidney disease understanding
+  "¿Qué son los cálculos renales?",
+  "¿Qué es la enfermedad renal crónica?",
+  "¿Cuáles son las etapas de la ERC?",
+  "¿Qué es la diálisis?",
+  "¿Por qué debo limitar el potasio?",
+  "¿Qué es la TFG y qué significa?",
+  "¿Por qué el fósforo afecta mis huesos?",
+  "¿Cómo funcionan los riñones?",
+  "¿Qué causa la enfermedad renal?",
+  "¿Puedo revertir el daño renal?",
 ];
 
 // Different rotation intervals for each position (in milliseconds)
