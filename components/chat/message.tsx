@@ -1,10 +1,9 @@
 "use client"
 
-import { useState, memo } from "react"
+import { useState, memo, useCallback } from "react"
 import { motion } from "framer-motion"
 import { Leaf, User, RefreshCw, AlertCircle, Copy, Download, Share2, Bookmark, BookmarkCheck, RotateCcw } from "lucide-react"
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import { LazyMarkdownGfm } from "@/components/chat/lazy-markdown"
 import { useToast } from "@/components/ui/toast"
 
 interface UIMessage {
@@ -39,16 +38,16 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
     (message.content.includes('Desayuno') || message.content.includes('Plan Semanal') || message.content.includes('🌅'))
   )
 
-  const handleCopy = async () => {
+  const handleCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(message.content)
       showToast("Mensaje copiado al portapapeles", "success")
     } catch {
       showToast("Error al copiar", "error")
     }
-  }
+  }, [message.content, showToast])
 
-  const handleShare = async () => {
+  const handleShare = useCallback(async () => {
     try {
       if (navigator.share) {
         await navigator.share({
@@ -63,33 +62,36 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
     } catch {
       // User cancelled share - ignore
     }
-  }
+  }, [message.content, showToast])
 
-  const handleRegenerate = () => {
+  const handleRegenerate = useCallback(() => {
     if (onRegenerate) {
       onRegenerate(message.id)
     }
-  }
+  }, [onRegenerate, message.id])
 
-  const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked)
-    // In a real app, this would save to localStorage or backend
-    const bookmarks = JSON.parse(localStorage.getItem('chat-bookmarks') || '[]')
-    if (!isBookmarked) {
-      bookmarks.push({
-        id: message.id,
-        content: message.content,
-        timestamp: message.timestamp,
-        savedAt: new Date(),
-      })
-    } else {
-      const index = bookmarks.findIndex((b: { id: string }) => b.id === message.id)
-      if (index > -1) bookmarks.splice(index, 1)
-    }
-    localStorage.setItem('chat-bookmarks', JSON.stringify(bookmarks))
-  }
+  const handleBookmark = useCallback(() => {
+    setIsBookmarked(prev => {
+      const newValue = !prev
+      // In a real app, this would save to localStorage or backend
+      const bookmarks = JSON.parse(localStorage.getItem('chat-bookmarks') || '[]')
+      if (newValue) {
+        bookmarks.push({
+          id: message.id,
+          content: message.content,
+          timestamp: message.timestamp,
+          savedAt: new Date(),
+        })
+      } else {
+        const index = bookmarks.findIndex((b: { id: string }) => b.id === message.id)
+        if (index > -1) bookmarks.splice(index, 1)
+      }
+      localStorage.setItem('chat-bookmarks', JSON.stringify(bookmarks))
+      return newValue
+    })
+  }, [message.id, message.content, message.timestamp])
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadPDF = useCallback(async () => {
     setIsDownloading(true)
     try {
       const response = await fetch('/api/generate-pdf', {
@@ -123,7 +125,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
     } finally {
       setIsDownloading(false)
     }
-  }
+  }, [message.content, showToast])
 
   return (
     <motion.div
@@ -162,7 +164,8 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
             </p>
           ) : (
             <>
-              <div
+              <LazyMarkdownGfm
+                content={message.content}
                 className={`
                   prose prose-sm max-w-none dark:prose-invert
                   ${isError ? 'text-red-700 dark:text-red-400' : 'text-gray-800 dark:text-gray-200'}
@@ -175,42 +178,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                   prose-li:my-1 prose-li:leading-relaxed
                   prose-hr:my-8 prose-hr:border-gray-200 dark:prose-hr:border-gray-700
                 `}
-                style={{
-                  '--tw-prose-bullets': '#374151',
-                } as React.CSSProperties}
-              >
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{
-                    h1: ({node, ...props}) => <h1 className="text-xl font-bold text-gray-900 mt-6 mb-6 pb-3 border-b-2 border-gray-300" {...props} />,
-                    h2: ({node, ...props}) => <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-4 pb-2 border-b border-gray-200" {...props} />,
-                    h3: ({node, ...props}) => <h3 className="text-base font-semibold text-gray-900 mt-6 mb-3" {...props} />,
-                    ul: ({node, ...props}) => <ul className="list-disc pl-6 space-y-1" {...props} />,
-                    ol: ({node, ...props}) => <ol className="list-decimal pl-6 space-y-1" {...props} />,
-                    a: ({node, href, children, ...props}) => (
-                      <a
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-medical-600 hover:text-medical-700 underline font-medium"
-                        {...props}
-                      >
-                        {children}
-                      </a>
-                    ),
-                    strong: ({node, children, ...props}) => {
-                      const text = String(children);
-                      // If bold text ends with a colon, render as a block heading
-                      if (text.endsWith(':')) {
-                        return <strong className="block mt-4 mb-2 text-gray-900 font-semibold" {...props}>{children}</strong>;
-                      }
-                      return <strong className="text-gray-900 font-semibold" {...props}>{children}</strong>;
-                    },
-                  }}
-                >
-                  {message.content}
-                </ReactMarkdown>
-              </div>
+              />
 
               {/* Action Buttons - only for non-error bot messages */}
               {!isError && (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, MessageSquare, Trash2, Edit2, Plus, Search, Inbox, Loader2 } from "lucide-react"
@@ -8,6 +8,21 @@ import { cn } from "@/lib/utils"
 import { getAllConversations, deleteConversation, updateConversationTitle, updateConversationTitleInDB, type Conversation } from "@/lib/session"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { useToast } from "@/components/ui/toast"
+
+// Custom hook for debounced value
+function useDebouncedValue<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => clearTimeout(timer)
+  }, [value, delay])
+
+  return debouncedValue
+}
 
 // Re-export Conversation type for backward compatibility
 export type { Conversation }
@@ -36,15 +51,18 @@ export function HistoryPanel({
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: string | null }>({ isOpen: false, id: null })
   const { showToast } = useToast()
 
-  // Filter and group conversations
+  // Debounce search query to reduce filter recalculations (300ms delay)
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 300)
+
+  // Filter and group conversations using debounced search
   const filteredConversations = useMemo(() => {
-    if (!searchQuery.trim()) return conversations
-    const query = searchQuery.toLowerCase()
+    if (!debouncedSearchQuery.trim()) return conversations
+    const query = debouncedSearchQuery.toLowerCase()
     return conversations.filter(c =>
       c.title.toLowerCase().includes(query) ||
       c.preview?.toLowerCase().includes(query)
     )
-  }, [conversations, searchQuery])
+  }, [conversations, debouncedSearchQuery])
 
   // Group conversations by date
   const groupedConversations = useMemo(() => {

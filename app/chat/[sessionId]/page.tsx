@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Plus, ArrowLeft, Star, ArrowDown, RefreshCw, Leaf, Edit2, Loader2, Check, X } from 'lucide-react';
@@ -180,10 +180,33 @@ export default function ChatPage() {
     let newTitle: string | null = null;
     let botMessageAdded = false;
 
+    // Debouncing refs for batched updates
+    let pendingUpdate = false;
+    let rafId: number | null = null;
+
     setMessages((prev) => [...prev, userMessage]);
     setIsTyping(true);
 
-    // Don't add bot message yet - skeleton will show while waiting
+    // Batched update function using requestAnimationFrame
+    const flushUpdate = () => {
+      if (!pendingUpdate) return;
+      pendingUpdate = false;
+
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === botMessageId
+            ? { ...msg, content: streamedContent }
+            : msg
+        )
+      );
+    };
+
+    // Schedule a batched update (max ~60fps)
+    const scheduleUpdate = () => {
+      if (pendingUpdate) return; // Already scheduled
+      pendingUpdate = true;
+      rafId = requestAnimationFrame(flushUpdate);
+    };
 
     try {
       const actualSessionId = sessionId === 'new' ? undefined : sessionId;
@@ -210,17 +233,23 @@ export default function ChatPage() {
             };
             setMessages((prev) => [...prev, newBotMessage]);
           } else {
-            // Update existing bot message with new content
-            setMessages((prev) =>
-              prev.map((msg) =>
-                msg.id === botMessageId
-                  ? { ...msg, content: streamedContent }
-                  : msg
-              )
-            );
+            // Schedule batched update instead of immediate setState
+            scheduleUpdate();
           }
         },
         onComplete: (agentUsed) => {
+          // Cancel any pending RAF and flush final content
+          if (rafId) cancelAnimationFrame(rafId);
+
+          // Ensure final content is rendered
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === botMessageId
+                ? { ...msg, content: streamedContent }
+                : msg
+            )
+          );
+
           setIsTyping(false);
 
           // Save conversation to localStorage
@@ -244,6 +273,9 @@ export default function ChatPage() {
           }
         },
         onError: (errorMsg) => {
+          // Cancel any pending RAF
+          if (rafId) cancelAnimationFrame(rafId);
+
           // Add or update error message
           const errorMessage: UIMessage = {
             id: botMessageId,
@@ -267,6 +299,9 @@ export default function ChatPage() {
         },
       });
     } catch (error) {
+      // Cancel any pending RAF
+      if (rafId) cancelAnimationFrame(rafId);
+
       // Add error message (bot message may not exist yet)
       const errorMessage: UIMessage = {
         id: botMessageId,
