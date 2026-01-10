@@ -28,6 +28,30 @@ interface LazyMarkdownProps {
   className?: string
 }
 
+/**
+ * Pre-process content to convert bare URLs to markdown links
+ * Handles: kidney.org, www.kidney.org, https://kidney.org, etc.
+ */
+function preprocessUrls(content: string): string {
+  // Pattern to match URLs that aren't already in markdown link format
+  // Matches: http(s)://, www., or common domains
+  const urlPattern = /(?<!\[.*?)(?<!\()\b((?:https?:\/\/)?(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*))/gi
+
+  return content.replace(urlPattern, (match, url) => {
+    // Skip if it's already part of a markdown link [text](url) or already processed
+    const beforeMatch = content.substring(0, content.indexOf(match))
+    if (beforeMatch.endsWith('](') || beforeMatch.endsWith('href="')) {
+      return match
+    }
+
+    // Add https:// if no protocol
+    const fullUrl = url.startsWith('http') ? url : `https://${url}`
+
+    // Return as markdown link
+    return `[${url}](${fullUrl})`
+  })
+}
+
 // Custom components for markdown rendering
 const markdownComponents = {
   h1: ({ node, ...props }: any) => (
@@ -74,13 +98,16 @@ const markdownComponents = {
 }
 
 export function LazyMarkdown({ content, className }: LazyMarkdownProps) {
+  // Pre-process to convert bare URLs to clickable links
+  const processedContent = preprocessUrls(content)
+
   return (
     <div className={className}>
       <ReactMarkdown
         remarkPlugins={[]}
         components={markdownComponents}
       >
-        {content}
+        {processedContent}
       </ReactMarkdown>
     </div>
   )
@@ -88,7 +115,7 @@ export function LazyMarkdown({ content, className }: LazyMarkdownProps) {
 
 // Enhanced version with GFM support (tables, strikethrough, etc.)
 // Use this when you need full GitHub Flavored Markdown
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 export function LazyMarkdownGfm({ content, className }: LazyMarkdownProps) {
   const [gfmPlugin, setGfmPlugin] = useState<any>(null)
@@ -97,13 +124,16 @@ export function LazyMarkdownGfm({ content, className }: LazyMarkdownProps) {
     getRemarkGfm().then(setGfmPlugin)
   }, [])
 
+  // Memoize URL preprocessing to avoid recalculation on re-renders
+  const processedContent = useMemo(() => preprocessUrls(content), [content])
+
   return (
     <div className={className}>
       <ReactMarkdown
         remarkPlugins={gfmPlugin ? [gfmPlugin] : []}
         components={markdownComponents}
       >
-        {content}
+        {processedContent}
       </ReactMarkdown>
     </div>
   )
