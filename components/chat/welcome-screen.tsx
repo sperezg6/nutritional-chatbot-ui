@@ -34,7 +34,6 @@ const allPrompts = [
   "Ayúdame a planear mis comidas",
   "¿Qué puedo comer con enfermedad renal?",
   "Recetas bajas en potasio",
-  "Explica mis resultados de laboratorio",
   "¿Cuánta proteína necesito?",
 
   // Meal planning
@@ -45,11 +44,8 @@ const allPrompts = [
   "Snacks saludables para dieta renal",
   "¿Qué frutas puedo comer?",
 
-  // Lab results and monitoring
-  "¿Qué significa mi función renal?",
-  "Niveles altos de creatinina",
+  // Hydration and monitoring
   "¿Cómo bajar el potasio?",
-  "Interpretar resultados de laboratorio",
   "Control de líquidos",
   "¿Cuándo consultar al médico?",
 
@@ -67,7 +63,6 @@ const allPrompts = [
   "¿Cuáles son las etapas de la ERC?",
   "¿Qué es la diálisis?",
   "¿Por qué debo limitar el potasio?",
-  "¿Qué es la TFG y qué significa?",
   "¿Por qué el fósforo afecta mis huesos?",
   "¿Cómo funcionan los riñones?",
   "¿Qué causa la enfermedad renal?",
