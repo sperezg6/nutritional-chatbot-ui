@@ -32,18 +32,33 @@ const config: Config = {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
-        // Medical green palette from landing page
+        // Alba clinic teal palette
         medical: {
-          50: '#E8F5F2',
-          100: '#C5E8E1',
-          200: '#9DD9CC',
-          300: '#75CAB7',
-          400: '#5BB3A0',
-          500: '#469C88',  // Primary green from landing page hero
-          600: '#3A8070',  // Hover state
-          700: '#2E6459',
-          800: '#234A43',
-          900: '#18302C',
+          50: '#E6F0F2',
+          100: '#C0D9DE',
+          200: '#96C0C9',
+          300: '#6BA7B4',
+          400: '#4B8E9F',
+          500: '#1A4D5C',  // Primary teal from Alba
+          600: '#164350',  // Hover state
+          700: '#123844',
+          800: '#0E2D37',
+          900: '#0A222B',
+        },
+        // Alba gold accent
+        alba: {
+          gold: {
+            50: '#FDF8EE',
+            100: '#FAF0DC',
+            200: '#F5E1B9',
+            300: '#F0D296',
+            400: '#EBC373',
+            500: '#E8B86D',  // Primary gold from Alba
+            600: '#D9A555',
+            700: '#C99240',
+            800: '#A87A34',
+            900: '#876228',
+          },
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",

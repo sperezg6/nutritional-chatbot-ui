@@ -5,8 +5,9 @@ import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send } from 'lucide-react';
 import { LiquidButton } from '@/components/ui/liquid-glass-button';
+import { GradientBlobBg } from '@/components/ui/gradient-blob-bg';
 
-// Lazy load Three.js component to reduce initial bundle size
+// Lazy load Three.js component to reduce initial bundle size (kept for optional use)
 const DottedSurface = dynamic(
   () => import('@/components/ui/dotted-surface').then(mod => ({ default: mod.DottedSurface })),
   { ssr: false }
@@ -161,15 +162,8 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
       exit="exit"
       className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center px-4 pt-20 pb-8 sm:px-6 sm:pt-12 sm:pb-12 relative overflow-hidden"
     >
-      {/* Animated Background - 3D Dotted Surface */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <DottedSurface
-          density={30}
-          amplitude={0.5}
-          frequency={1.5}
-          speed={0.5}
-        />
-      </div>
+      {/* Alba Gradient Blob Background */}
+      <GradientBlobBg opacity={0.5} />
 
       <div className="max-w-6xl w-full text-center relative z-10">
         {/* Title & Subtitle - exits first */}
@@ -252,8 +246,8 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
             className="flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2.5 sm:py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full shadow-sm transition-all"
             animate={isFocused ? {
               scale: 1.02,
-              borderColor: '#469C88',
-              boxShadow: '0 0 0 3px rgba(70, 156, 136, 0.15)',
+              borderColor: '#1A4D5C',
+              boxShadow: '0 0 0 3px rgba(26, 77, 92, 0.15)',
             } : {
               scale: 1,
               borderColor: 'var(--border-color, #e5e7eb)',

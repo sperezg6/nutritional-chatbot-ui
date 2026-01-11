@@ -51,7 +51,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
     try {
       if (navigator.share) {
         await navigator.share({
-          title: 'Información de Nutrición Renal',
+          title: 'Información de Alba - Nutrición Renal',
           text: message.content,
         })
       } else {

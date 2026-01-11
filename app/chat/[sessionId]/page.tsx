@@ -15,6 +15,7 @@ import { EmptyState } from '@/components/chat/empty-state';
 import { sendMessage, sendMessageStreaming, getErrorMessage } from '@/lib/api';
 import { saveConversation as saveToStorage, getConversation as getFromStorage, updateConversationTitle, updateConversationTitleInDB, type Conversation } from '@/lib/session';
 import { useToast } from '@/components/ui/toast';
+import { GradientBlobBg } from '@/components/ui/gradient-blob-bg';
 // UI Message type for chat display
 interface UIMessage {
   id: string;
@@ -382,10 +383,13 @@ export default function ChatPage() {
 
   return (
     <div className="relative">
+      {/* Alba Gradient Blob Background */}
+      <GradientBlobBg opacity={0.4} />
+
       <motion.div
         initial="initial"
         animate="animate"
-        className="flex flex-col h-screen w-full bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950"
+        className="flex flex-col h-screen w-full bg-gradient-to-b from-white/80 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-950/95"
       >
         {/* Header */}
         <motion.div
@@ -413,7 +417,7 @@ export default function ChatPage() {
                 <Leaf className="w-4 h-4 text-white" />
               </div>
               <span className="hidden sm:block text-sm font-semibold text-medical-600 dark:text-medical-400">
-                NutriRenal
+                Alba
               </span>
             </button>
 

@@ -71,11 +71,11 @@ export default function Home() {
             transition={{ duration: 0.4, delay: 0.1 }}
             className="flex items-center gap-2.5"
           >
-            <div className="w-10 h-10 bg-medical-500 rounded-xl flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 bg-gradient-to-br from-medical-500 to-medical-600 rounded-xl flex items-center justify-center shadow-sm">
               <Leaf className="w-5 h-5 text-white" strokeWidth={1.5} />
             </div>
             <span className="text-lg font-semibold text-medical-600 dark:text-medical-400">
-              NutriRenal
+              Alba
             </span>
           </motion.div>
 
