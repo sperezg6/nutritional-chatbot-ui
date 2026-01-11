@@ -87,7 +87,8 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
   const isMobile = useIsMobile();
 
   // Track current prompt index for each position (4 on mobile, 6 on desktop)
-  const [promptIndices, setPromptIndices] = useState<number[]>([0, 6, 12, 18, 4, 10]);
+  // Spread indices across the array to show variety
+  const [promptIndices, setPromptIndices] = useState<number[]>([0, 5, 11, 16, 22, 27].map(i => i % allPrompts.length));
 
   // Show fewer prompts on mobile
   const visiblePromptCount = isMobile ? 4 : 6;
@@ -195,30 +196,34 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
 
         {/* Rotating Prompt Buttons - 4 on mobile, 6 on desktop */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 max-w-3xl mx-auto mb-6 sm:mb-8 px-2 sm:px-0">
-          {visiblePromptIndices.map((promptIndex, position) => (
-            <div key={position} className="relative min-h-[44px] sm:min-h-[48px]">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`${position}-${promptIndex}`}
-                  initial={!prefersReducedMotion ? { opacity: 0, y: 10 } : { opacity: 1, y: 0 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={!prefersReducedMotion ? { opacity: 0, y: -10 } : {}}
-                  transition={{
-                    duration: 0.3,
-                    ease: [0.4, 0.0, 0.2, 1]
-                  }}
-                  className="absolute inset-0"
-                >
-                  <LiquidButton
-                    onClick={() => handlePromptClick(allPrompts[promptIndex])}
-                    className="text-left px-3 py-2.5 sm:px-5 sm:py-4 text-sm sm:text-base text-gray-700 font-medium min-h-[44px] sm:min-h-[48px] w-full"
+          {visiblePromptIndices.map((promptIndex, position) => {
+            const prompt = allPrompts[promptIndex % allPrompts.length];
+            if (!prompt) return null;
+            return (
+              <div key={position} className="relative min-h-[44px] sm:min-h-[48px]">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`${position}-${promptIndex}`}
+                    initial={!prefersReducedMotion ? { opacity: 0, y: 10 } : { opacity: 1, y: 0 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={!prefersReducedMotion ? { opacity: 0, y: -10 } : {}}
+                    transition={{
+                      duration: 0.3,
+                      ease: [0.4, 0.0, 0.2, 1]
+                    }}
+                    className="absolute inset-0"
                   >
-                    {allPrompts[promptIndex]}
-                  </LiquidButton>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          ))}
+                    <LiquidButton
+                      onClick={() => handlePromptClick(prompt)}
+                      className="text-left px-3 py-2.5 sm:px-5 sm:py-4 text-sm sm:text-base text-gray-700 font-medium min-h-[44px] sm:min-h-[48px] w-full"
+                    >
+                      {prompt}
+                    </LiquidButton>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            );
+          })}
         </div>
 
         {/* Input Field - subtle fade */}
