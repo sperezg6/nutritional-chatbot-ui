@@ -87,8 +87,8 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
   const isMobile = useIsMobile();
 
   // Track current prompt index for each position (4 on mobile, 6 on desktop)
-  // Spread indices across the array to show variety
-  const [promptIndices, setPromptIndices] = useState<number[]>([0, 5, 11, 16, 22, 27].map(i => i % allPrompts.length));
+  // Spread indices across the array to show variety (array has 29 items)
+  const [promptIndices, setPromptIndices] = useState<number[]>([0, 5, 11, 16, 22, 27]);
 
   // Show fewer prompts on mobile
   const visiblePromptCount = isMobile ? 4 : 6;

@@ -1,9 +1,10 @@
 "use client"
 
+import { useMemo } from 'react'
 import dynamic from 'next/dynamic'
-import { ComponentProps } from 'react'
+import remarkGfm from 'remark-gfm'
 
-// Lazy load react-markdown and remark-gfm to reduce initial bundle size
+// Lazy load react-markdown to reduce initial bundle size
 // These are only needed for assistant messages, not user messages
 const ReactMarkdown = dynamic(
   () => import('react-markdown').then(mod => mod.default),
@@ -12,16 +13,6 @@ const ReactMarkdown = dynamic(
     ssr: false,
   }
 )
-
-// Lazy load remark-gfm plugin
-let remarkGfmPlugin: any = null
-const getRemarkGfm = async () => {
-  if (!remarkGfmPlugin) {
-    const mod = await import('remark-gfm')
-    remarkGfmPlugin = mod.default
-  }
-  return remarkGfmPlugin
-}
 
 interface LazyMarkdownProps {
   content: string
@@ -115,22 +106,14 @@ export function LazyMarkdown({ content, className }: LazyMarkdownProps) {
 
 // Enhanced version with GFM support (tables, strikethrough, etc.)
 // Use this when you need full GitHub Flavored Markdown
-import { useState, useEffect, useMemo } from 'react'
-
 export function LazyMarkdownGfm({ content, className }: LazyMarkdownProps) {
-  const [gfmPlugin, setGfmPlugin] = useState<any>(null)
-
-  useEffect(() => {
-    getRemarkGfm().then(setGfmPlugin)
-  }, [])
-
   // Memoize URL preprocessing to avoid recalculation on re-renders
   const processedContent = useMemo(() => preprocessUrls(content), [content])
 
   return (
     <div className={className}>
       <ReactMarkdown
-        remarkPlugins={gfmPlugin ? [gfmPlugin] : []}
+        remarkPlugins={[remarkGfm]}
         components={markdownComponents}
       >
         {processedContent}

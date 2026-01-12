@@ -1,7 +1,5 @@
 "use client"
 
-import Image from 'next/image'
-
 interface GradientBlobBgProps {
   className?: string
   opacity?: number
@@ -15,12 +13,11 @@ export function GradientBlobBg({ className = '', opacity = 0.6 }: GradientBlobBg
         className="absolute -top-1/4 -right-1/4 w-[800px] h-[800px] md:w-[1200px] md:h-[1200px]"
         style={{ opacity }}
       >
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/gradient-blob.png"
           alt=""
-          fill
-          className="object-contain"
-          priority
+          className="w-full h-full object-contain"
         />
       </div>
 
@@ -29,12 +26,11 @@ export function GradientBlobBg({ className = '', opacity = 0.6 }: GradientBlobBg
         className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] md:w-[900px] md:h-[900px] rotate-180"
         style={{ opacity: opacity * 0.5 }}
       >
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/gradient-blob.png"
           alt=""
-          fill
-          className="object-contain"
-          priority
+          className="w-full h-full object-contain"
         />
       </div>
     </div>
