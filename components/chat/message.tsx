@@ -173,9 +173,9 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                   prose-h2:text-lg prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-gray-200 dark:prose-h2:border-gray-700 prose-h2:pb-2
                   prose-h3:text-base prose-h3:mt-6 prose-h3:mb-3
                   prose-p:my-3 prose-p:leading-relaxed
-                  prose-ul:my-4 prose-ul:space-y-1.5
-                  prose-ol:my-4 prose-ol:space-y-1.5
-                  prose-li:my-1 prose-li:leading-relaxed
+                  prose-ul:my-4 prose-ul:space-y-1.5 prose-ul:list-none
+                  prose-ol:my-4 prose-ol:space-y-1.5 prose-ol:list-none
+                  prose-li:my-1 prose-li:leading-relaxed prose-li:pl-0
                   prose-hr:my-8 prose-hr:border-gray-200 dark:prose-hr:border-gray-700
                 `}
               />

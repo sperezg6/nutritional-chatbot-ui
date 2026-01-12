@@ -55,10 +55,13 @@ const markdownComponents = {
     <h3 className="text-base font-semibold text-gray-900 dark:text-white mt-6 mb-3" {...props} />
   ),
   ul: ({ node, ...props }: any) => (
-    <ul className="list-disc pl-6 space-y-1" {...props} />
+    <ul className="list-disc pl-6 space-y-1 [&>li]:marker:text-gray-400" {...props} />
   ),
   ol: ({ node, ...props }: any) => (
     <ol className="list-decimal pl-6 space-y-1" {...props} />
+  ),
+  li: ({ node, children, ...props }: any) => (
+    <li className="pl-1" {...props}>{children}</li>
   ),
   a: ({ node, href, children, ...props }: any) => (
     <a
