@@ -9,11 +9,11 @@ interface RatingInteractionProps {
 }
 
 const ratingData = [
-  { emoji: "😔", label: "Terrible", color: "from-red-400 to-red-500", shadowColor: "shadow-red-500/30" },
-  { emoji: "😕", label: "Pobre", color: "from-orange-400 to-orange-500", shadowColor: "shadow-orange-500/30" },
-  { emoji: "😐", label: "Normal", color: "from-yellow-400 to-yellow-500", shadowColor: "shadow-yellow-500/30" },
-  { emoji: "🙂", label: "Bueno", color: "from-lime-400 to-lime-500", shadowColor: "shadow-lime-500/30" },
-  { emoji: "😍", label: "Excelente", color: "from-emerald-400 to-emerald-500", shadowColor: "shadow-emerald-500/30" },
+  { emoji: "😔", label: "Terrible", value: 1 },
+  { emoji: "😕", label: "Pobre", value: 2 },
+  { emoji: "😐", label: "Normal", value: 3 },
+  { emoji: "🙂", label: "Bueno", value: 4 },
+  { emoji: "😍", label: "Excelente", value: 5 },
 ]
 
 export function RatingInteraction({ onChange, className }: RatingInteractionProps) {
@@ -29,69 +29,54 @@ export function RatingInteraction({ onChange, className }: RatingInteractionProp
   const activeData = displayRating > 0 ? ratingData[displayRating - 1] : null
 
   return (
-    <div className={cn("flex flex-col items-center gap-6", className)}>
+    <div className={cn("flex flex-col items-center gap-4", className)}>
       {/* Emoji rating buttons */}
-      <div className="flex items-center gap-3">
-        {ratingData.map((item, i) => {
-          const value = i + 1
-          const isActive = value <= displayRating
-          const isExact = value === displayRating
+      <div className="flex items-center gap-2 sm:gap-4">
+        {ratingData.map((item) => {
+          const isSelected = rating === item.value
+          const isHovered = hoverRating === item.value
+          const isActive = displayRating >= item.value
 
           return (
             <button
-              key={value}
-              onClick={() => handleClick(value)}
-              onMouseEnter={() => setHoverRating(value)}
+              key={item.value}
+              onClick={() => handleClick(item.value)}
+              onMouseEnter={() => setHoverRating(item.value)}
               onMouseLeave={() => setHoverRating(0)}
-              className="group relative focus:outline-none"
-              aria-label={`Calificar ${value}: ${item.label}`}
+              className={cn(
+                "relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl transition-all duration-300 ease-out",
+                "hover:bg-gray-100 dark:hover:bg-gray-800",
+                isSelected && "bg-[var(--color-primary)]/10 ring-2 ring-[var(--color-primary)]",
+                !isSelected && isHovered && "bg-gray-100 dark:bg-gray-800"
+              )}
+              aria-label={`Calificar ${item.value}: ${item.label}`}
             >
-              <div
+              <span
                 className={cn(
-                  "relative flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-300 ease-out",
-                  isActive ? "scale-110" : "scale-100 group-hover:scale-105",
+                  "text-3xl sm:text-4xl transition-all duration-300 ease-out select-none",
+                  isActive || isHovered
+                    ? "grayscale-0 scale-110"
+                    : "grayscale-[0.5] opacity-60 hover:opacity-80 hover:grayscale-[0.2]"
                 )}
               >
-                {/* Emoji with smooth grayscale transition */}
-                <span
-                  className={cn(
-                    "text-3xl transition-all duration-300 ease-out select-none",
-                    isActive
-                      ? "grayscale-0 drop-shadow-lg"
-                      : "grayscale opacity-40 group-hover:opacity-70 group-hover:grayscale-[0.3]",
-                  )}
-                >
-                  {item.emoji}
-                </span>
-              </div>
+                {item.emoji}
+              </span>
             </button>
           )
         })}
       </div>
 
-      <div className="relative h-7 w-32">
-        {/* Default "Rate us" text */}
-        <div
-          className={cn(
-            "absolute inset-0 flex items-center justify-center transition-all duration-300 ease-out",
-            displayRating > 0 ? "opacity-0 blur-md scale-95" : "opacity-100 blur-0 scale-100",
-          )}
-        >
-          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Califícanos</span>
-        </div>
-
-        {/* Rating labels with blur in/out effect */}
-        {ratingData.map((item, i) => (
-          <div
-            key={i}
-            className={cn(
-              "absolute inset-0 flex items-center justify-center transition-all duration-300 ease-out",
-              displayRating === i + 1 ? "opacity-100 blur-0 scale-100" : "opacity-0 blur-md scale-105",
-            )}
-          >
-            <span className="text-sm font-semibold tracking-wide text-gray-900 dark:text-white">{item.label}</span>
-          </div>
-        ))}
+      {/* Rating label */}
+      <div className="h-6 flex items-center justify-center">
+        {activeData ? (
+          <span className="text-sm font-medium text-[var(--color-text)] dark:text-white animate-fade-in">
+            {activeData.label}
+          </span>
+        ) : (
+          <span className="text-sm text-[var(--color-muted)] dark:text-gray-400">
+            Selecciona una calificación
+          </span>
+        )}
       </div>
     </div>
   )

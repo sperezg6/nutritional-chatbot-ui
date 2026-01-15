@@ -168,7 +168,7 @@ export function HistoryPanel({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/30 z-40"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
             onClick={onClose}
           />
         )}
@@ -182,25 +182,25 @@ export function HistoryPanel({
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed left-0 top-0 bottom-0 w-80 max-w-[90vw] bg-white dark:bg-gray-900 shadow-2xl z-50 flex flex-col"
+            className="fixed left-0 top-0 bottom-0 w-80 max-w-[90vw] bg-[#0D0D0D] shadow-2xl z-50 flex flex-col border-r border-white/10"
           >
             {/* Header */}
-            <div className="backdrop-blur-md bg-white/90 dark:bg-gray-900/90 border-b border-gray-100 dark:border-gray-800 px-6 py-6 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Historial de chats</h2>
+            <div className="border-b border-white/10 px-6 py-6 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-white">Historial de chats</h2>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                 aria-label="Cerrar historial"
               >
-                <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
 
             {/* New Chat Button */}
-            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+            <div className="px-6 py-4 border-b border-white/10">
               <button
                 onClick={handleNewChat}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-medical-500 hover:bg-medical-600 text-white font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-alba-lime hover:bg-alba-lime-hover text-alba-dark font-medium transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Plus className="w-5 h-5" />
                 Nuevo chat
@@ -209,15 +209,15 @@ export function HistoryPanel({
 
             {/* Search */}
             {conversations.length > 0 && (
-              <div className="px-6 py-3 border-b border-gray-100 dark:border-gray-800">
+              <div className="px-6 py-3 border-b border-white/10">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                   <input
                     type="text"
                     placeholder="Buscar conversaciones..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-medical-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                    className="w-full pl-9 pr-4 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-alba-lime/50 focus:border-alba-lime/50 text-white placeholder-gray-500 transition-all"
                   />
                 </div>
               </div>
@@ -226,22 +226,22 @@ export function HistoryPanel({
             {/* Conversations List */}
             <div className="flex-1 overflow-y-auto px-4 py-4">
               {conversations.length === 0 ? (
-                <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+                <div className="text-center py-12 text-gray-500">
                   <Inbox className="w-12 h-12 mx-auto mb-3 opacity-50" />
                   <p className="text-sm font-medium">No hay conversaciones aún</p>
-                  <p className="text-xs mt-1">Inicia una nueva conversación</p>
+                  <p className="text-xs mt-1 text-gray-600">Inicia una nueva conversación</p>
                 </div>
               ) : filteredConversations.length === 0 ? (
-                <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+                <div className="text-center py-12 text-gray-500">
                   <Search className="w-10 h-10 mx-auto mb-3 opacity-50" />
                   <p className="text-sm font-medium">Sin resultados</p>
-                  <p className="text-xs mt-1">Prueba con otra búsqueda</p>
+                  <p className="text-xs mt-1 text-gray-600">Prueba con otra búsqueda</p>
                 </div>
               ) : (
                 Object.entries(groupedConversations).map(([group, convs]) =>
                   convs.length > 0 && (
                     <div key={group} className="mb-4">
-                      <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 mb-2">
+                      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 mb-2">
                         {group}
                       </h3>
                       {convs.map((conversation) => (
@@ -250,10 +250,10 @@ export function HistoryPanel({
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     className={cn(
-                      "group relative px-4 py-4 rounded-xl transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer mb-2",
+                      "group relative px-4 py-4 rounded-xl transition-all duration-200 cursor-pointer mb-2",
                       currentConversationId === conversation.id
-                        ? "bg-medical-50 dark:bg-medical-900/30 border-l-4 border-l-medical-500 shadow-sm"
-                        : "hover:shadow-sm"
+                        ? "bg-alba-lime/10 border-l-4 border-l-alba-lime"
+                        : "hover:bg-white/5"
                     )}
                     onClick={() => handleSelectConversation(conversation.id)}
                   >
@@ -261,8 +261,8 @@ export function HistoryPanel({
                       <MessageSquare className={cn(
                         "w-5 h-5 flex-shrink-0 mt-0.5",
                         currentConversationId === conversation.id
-                          ? "text-medical-600 dark:text-medical-400"
-                          : "text-gray-400 dark:text-gray-500"
+                          ? "text-alba-lime"
+                          : "text-gray-500"
                       )} />
                       <div className="flex-1 min-w-0 pr-16">
                         {editingId === conversation.id ? (
@@ -279,44 +279,44 @@ export function HistoryPanel({
                             }}
                             onBlur={() => handleEditSave(conversation.id)}
                             onClick={(e) => e.stopPropagation()}
-                            className="w-full px-2 py-1 text-sm border border-medical-300 dark:border-medical-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-medical-500"
+                            className="w-full px-2 py-1 text-sm border border-alba-lime/50 rounded-lg bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-alba-lime/50"
                             autoFocus
                           />
                         ) : (
-                          <div className="font-semibold text-gray-800 dark:text-gray-100 text-base leading-tight flex items-center gap-2">
+                          <div className="font-medium text-white text-sm leading-tight flex items-center gap-2">
                             {conversation.title}
                             {savingId === conversation.id && (
-                              <Loader2 className="w-3 h-3 animate-spin text-medical-500" />
+                              <Loader2 className="w-3 h-3 animate-spin text-alba-lime" />
                             )}
                           </div>
                         )}
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                        <div className="text-xs text-gray-500 mt-1.5">
                           {formatTimestamp(conversation.timestamp)}
                         </div>
                       </div>
                     </div>
 
                     {/* Action buttons */}
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                    <div className="absolute top-3 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
                           handleEditStart(conversation)
                         }}
-                        className="p-1.5 rounded-lg hover:bg-white/80 dark:hover:bg-gray-700 transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
                         aria-label="Renombrar conversación"
                       >
-                        <Edit2 className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+                        <Edit2 className="w-3.5 h-3.5 text-gray-400 hover:text-white" />
                       </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
                           handleDeleteClick(conversation.id)
                         }}
-                        className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-red-500/20 transition-colors"
                         aria-label="Eliminar conversación"
                       >
-                        <Trash2 className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
+                        <Trash2 className="w-3.5 h-3.5 text-gray-400 hover:text-red-400" />
                       </button>
                     </div>
                       </motion.div>
@@ -328,7 +328,10 @@ export function HistoryPanel({
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 text-xs text-gray-500 dark:text-gray-400 text-center">
+            <div className="px-6 py-4 border-t border-white/10 text-xs text-gray-500 text-center flex items-center justify-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-white font-medium text-xs">
+                N
+              </div>
               {conversations.length} {conversations.length !== 1 ? "conversaciones" : "conversación"}
             </div>
           </motion.div>

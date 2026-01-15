@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { ChevronRight } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 
 interface FollowUpSuggestionsProps {
   suggestions: string[]
@@ -19,6 +19,12 @@ export function FollowUpSuggestions({ suggestions, onSelect, isVisible = true }:
       transition={{ duration: 0.3, delay: 0.2 }}
       className="mt-4 ml-0 md:ml-11"
     >
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-1.5 h-1.5 rounded-full bg-white/30" />
+        <span className="text-[10px] font-medium text-white/30 uppercase tracking-wider">
+          Sugerencias
+        </span>
+      </div>
       <div className="flex flex-wrap gap-2">
         {suggestions.map((suggestion, index) => (
           <motion.button
@@ -27,13 +33,12 @@ export function FollowUpSuggestions({ suggestions, onSelect, isVisible = true }:
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2, delay: 0.05 * index }}
             onClick={() => onSelect(suggestion)}
-            className="group inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300
-                       hover:text-medical-600 dark:hover:text-medical-400
-                       hover:bg-medical-50/50 dark:hover:bg-medical-900/20 rounded-lg
+            className="group inline-flex items-center gap-2 px-3 py-2 text-sm text-white/50 border border-white/10
+                       hover:text-white hover:border-[#D4FF00]/50 hover:bg-white/5
                        transition-all duration-200 cursor-pointer"
           >
             <span>{suggestion}</span>
-            <ChevronRight className="w-3.5 h-3.5 text-gray-400 group-hover:text-medical-500 group-hover:translate-x-0.5 transition-all" />
+            <ArrowUpRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#D4FF00] transition-all" />
           </motion.button>
         ))}
       </div>

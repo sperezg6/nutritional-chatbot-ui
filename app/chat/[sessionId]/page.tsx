@@ -3,19 +3,17 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Plus, ArrowLeft, Star, ArrowDown, RefreshCw, Leaf, Edit2, Loader2, Check, X } from 'lucide-react';
+import { MessageSquare, Plus, Star, ArrowDown, Edit2, Loader2, Check, X, Send, ArrowLeft } from 'lucide-react';
 import { ChatMessage } from '@/components/chat/message';
-import { ChatInput } from '@/components/chat/chat-input';
 import { MessageSkeleton } from '@/components/chat/message-skeleton';
 import { HistoryPanel } from '@/components/chat/history-panel';
 import { FeedbackModal } from '@/components/chat/feedback-modal';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { FollowUpSuggestions, generateFollowUpSuggestions } from '@/components/chat/follow-up-suggestions';
 import { EmptyState } from '@/components/chat/empty-state';
 import { sendMessage, sendMessageStreaming, getErrorMessage } from '@/lib/api';
 import { saveConversation as saveToStorage, getConversation as getFromStorage, updateConversationTitle, updateConversationTitleInDB, type Conversation } from '@/lib/session';
 import { useToast } from '@/components/ui/toast';
-import { GradientBlobBg } from '@/components/ui/gradient-blob-bg';
+
 // UI Message type for chat display
 interface UIMessage {
   id: string;
@@ -45,19 +43,17 @@ export default function ChatPage() {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
   const [isSavingTitle, setIsSavingTitle] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const hasProcessedFirstMessage = useRef(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToast();
 
-  // Load conversation on mount (from localStorage as backup)
-  // Skip if messages already exist (prevents reload after URL swap from /chat/new)
+  // Load conversation on mount
   useEffect(() => {
-    // Don't try to load if this is a new session
     if (sessionId === 'new') return;
-
-    // Skip if messages are already loaded (URL just changed from /chat/new)
     if (messages.length > 0) return;
 
     const conversation = getFromStorage(sessionId);
@@ -68,7 +64,7 @@ export default function ChatPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
-  // Handle first message from query param (only once)
+  // Handle first message from query param
   useEffect(() => {
     if (firstMessage && messages.length === 0 && !hasProcessedFirstMessage.current) {
       hasProcessedFirstMessage.current = true;
@@ -82,7 +78,7 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // Track scroll position for scroll-to-bottom button (debounced)
+  // Track scroll position for scroll-to-bottom button
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
@@ -95,7 +91,7 @@ export default function ChatPage() {
         const { scrollTop, scrollHeight, clientHeight } = container;
         const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
         setShowScrollButton(!isNearBottom && messages.length > 2);
-      }, 100); // Debounce 100ms
+      }, 100);
     };
 
     container.addEventListener('scroll', handleScroll);
@@ -114,7 +110,6 @@ export default function ChatPage() {
     const messageIndex = messages.findIndex((m) => m.id === messageId);
     if (messageIndex === -1) return;
 
-    // Find the user message before this assistant message
     let userMessageIndex = messageIndex - 1;
     while (userMessageIndex >= 0 && messages[userMessageIndex].role !== 'user') {
       userMessageIndex--;
@@ -122,23 +117,17 @@ export default function ChatPage() {
     if (userMessageIndex < 0) return;
 
     const userMessage = messages[userMessageIndex];
-
-    // Remove the assistant message we want to regenerate
     setMessages((prev) => prev.filter((m) => m.id !== messageId));
-
-    // Resend the user's message
     await handleSendMessage(userMessage.content);
   };
 
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Cmd/Ctrl + K for new chat
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         handleNewChat();
       }
-      // Cmd/Ctrl + H for history
       if ((e.metaKey || e.ctrlKey) && e.key === 'h') {
         e.preventDefault();
         setIsHistoryOpen(true);
@@ -151,7 +140,6 @@ export default function ChatPage() {
 
   // Save conversation whenever messages change
   useEffect(() => {
-    // Don't save if this is still a 'new' session (wait for real session_id)
     if (sessionId === 'new') return;
 
     if (messages.length > 0) {
@@ -167,7 +155,6 @@ export default function ChatPage() {
   }, [messages, sessionId, conversationTitle]);
 
   const handleSendMessage = async (content: string) => {
-    // Add user message
     const userMessage: UIMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -181,14 +168,12 @@ export default function ChatPage() {
     let newTitle: string | null = null;
     let botMessageAdded = false;
 
-    // Debouncing refs for batched updates
     let pendingUpdate = false;
     let rafId: number | null = null;
 
     setMessages((prev) => [...prev, userMessage]);
     setIsTyping(true);
 
-    // Batched update function using requestAnimationFrame
     const flushUpdate = () => {
       if (!pendingUpdate) return;
       pendingUpdate = false;
@@ -202,9 +187,8 @@ export default function ChatPage() {
       );
     };
 
-    // Schedule a batched update (max ~60fps)
     const scheduleUpdate = () => {
-      if (pendingUpdate) return; // Already scheduled
+      if (pendingUpdate) return;
       pendingUpdate = true;
       rafId = requestAnimationFrame(flushUpdate);
     };
@@ -223,7 +207,6 @@ export default function ChatPage() {
         onChunk: (chunk) => {
           streamedContent += chunk;
 
-          // Add bot message on first chunk (replaces skeleton)
           if (!botMessageAdded) {
             botMessageAdded = true;
             const newBotMessage: UIMessage = {
@@ -234,15 +217,12 @@ export default function ChatPage() {
             };
             setMessages((prev) => [...prev, newBotMessage]);
           } else {
-            // Schedule batched update instead of immediate setState
             scheduleUpdate();
           }
         },
         onComplete: (agentUsed) => {
-          // Cancel any pending RAF and flush final content
           if (rafId) cancelAnimationFrame(rafId);
 
-          // Ensure final content is rendered
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === botMessageId
@@ -253,7 +233,6 @@ export default function ChatPage() {
 
           setIsTyping(false);
 
-          // Save conversation to localStorage
           if (sessionId === 'new' && newSessionId) {
             const finalBotMessage: UIMessage = {
               id: botMessageId,
@@ -274,10 +253,8 @@ export default function ChatPage() {
           }
         },
         onError: (errorMsg) => {
-          // Cancel any pending RAF
           if (rafId) cancelAnimationFrame(rafId);
 
-          // Add or update error message
           const errorMessage: UIMessage = {
             id: botMessageId,
             role: 'assistant',
@@ -300,10 +277,8 @@ export default function ChatPage() {
         },
       });
     } catch (error) {
-      // Cancel any pending RAF
       if (rafId) cancelAnimationFrame(rafId);
 
-      // Add error message (bot message may not exist yet)
       const errorMessage: UIMessage = {
         id: botMessageId,
         role: 'assistant',
@@ -333,16 +308,13 @@ export default function ChatPage() {
     const failedMessage = messages[messageIndex] as UIMessage;
     if (!failedMessage.originalContent) return;
 
-    // Remove the error message
     setMessages((prev) => prev.filter((m) => m.id !== messageId));
-
-    // Retry sending the original message
     await handleSendMessage(failedMessage.originalContent);
   };
 
   // Title editing handlers
   const handleStartEditTitle = () => {
-    if (sessionId === 'new') return; // Can't edit title of new conversation
+    if (sessionId === 'new') return;
     setEditedTitle(conversationTitle);
     setIsEditingTitle(true);
     setTimeout(() => titleInputRef.current?.focus(), 0);
@@ -355,13 +327,11 @@ export default function ChatPage() {
       return;
     }
 
-    // Update locally first for instant feedback
     setConversationTitle(trimmedTitle);
     updateConversationTitle(sessionId, trimmedTitle);
     setIsEditingTitle(false);
     setIsSavingTitle(true);
 
-    // Sync with database
     const result = await updateConversationTitleInDB(sessionId, trimmedTitle);
     setIsSavingTitle(false);
 
@@ -381,224 +351,225 @@ export default function ChatPage() {
     router.push('/');
   };
 
+  const handleInputSend = () => {
+    if (inputValue.trim() && !isTyping) {
+      handleSendMessage(inputValue.trim());
+      setInputValue('');
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleInputSend();
+    }
+  };
+
   return (
-    <div className="relative">
-      {/* Alba Gradient Blob Background */}
-      <GradientBlobBg opacity={0.4} />
-
-      <motion.div
-        initial="initial"
-        animate="animate"
-        className="flex flex-col h-screen w-full bg-gradient-to-b from-white/80 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-950/95"
+    <div className="min-h-screen bg-[#0D0D0D] flex flex-col">
+      {/* Alba-style Header */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="border-b border-white/10 px-4 md:px-6 lg:px-10 py-4"
       >
-        {/* Header */}
-        <motion.div
-          variants={{
-            initial: { opacity: 0, y: -30 },
-            animate: {
-              opacity: 1,
-              y: 0,
-              transition: {
-                duration: 0.3,
-                ease: [0.0, 0.0, 0.2, 1],
-              },
-            },
-          }}
-          className="backdrop-blur-md bg-white/95 dark:bg-gray-900/95 border-b border-gray-100 dark:border-gray-800 px-4 md:px-6 py-3 shadow-sm"
-        >
-          <div className="max-w-6xl mx-auto flex items-center gap-2 md:gap-3">
-            {/* Logo/Brand */}
-            <button
-              onClick={handleNewChat}
-              className="flex items-center gap-2 p-1.5 hover:bg-medical-50 dark:hover:bg-medical-900/30 rounded-xl transition-colors"
-              aria-label="Inicio"
-            >
-              <div className="w-8 h-8 bg-gradient-to-br from-medical-500 to-medical-600 rounded-lg flex items-center justify-center shadow-sm">
-                <Leaf className="w-4 h-4 text-white" />
-              </div>
-              <span className="hidden sm:block text-sm font-semibold text-medical-600 dark:text-medical-400">
-                Alba
-              </span>
-            </button>
+        <div className="max-w-6xl mx-auto flex items-center gap-3">
+          {/* Back/Home */}
+          <button
+            onClick={handleNewChat}
+            className="p-2 text-white/60 hover:text-white hover:bg-white/5 transition-all"
+            aria-label="Volver al inicio"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
 
-            {/* Divider */}
-            <div className="hidden sm:block w-px h-6 bg-gray-200 dark:bg-gray-700" />
+          {/* History button */}
+          <button
+            onClick={() => setIsHistoryOpen(true)}
+            className="p-2 text-white/60 hover:text-white hover:bg-white/5 transition-all"
+            aria-label="Ver historial"
+          >
+            <MessageSquare className="w-5 h-5" />
+          </button>
 
-            {/* History button */}
-            <button
-              onClick={() => setIsHistoryOpen(true)}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
-              aria-label="Ver historial"
-            >
-              <MessageSquare className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            </button>
+          {/* Divider */}
+          <div className="w-px h-5 bg-white/10" />
 
-            {/* Title - Editable */}
-            <div className="flex-1 min-w-0 flex items-center gap-2">
-              {isEditingTitle ? (
-                <div className="flex items-center gap-2 flex-1">
-                  <input
-                    ref={titleInputRef}
-                    type="text"
-                    value={editedTitle}
-                    onChange={(e) => setEditedTitle(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSaveTitle();
-                      else if (e.key === 'Escape') handleCancelEditTitle();
-                    }}
-                    className="flex-1 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-medical-300 dark:border-medical-600 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-medical-500"
-                    maxLength={255}
-                  />
-                  <button
-                    onClick={handleSaveTitle}
-                    className="p-1 hover:bg-medical-50 dark:hover:bg-medical-900/30 rounded transition-colors"
-                    aria-label="Guardar título"
-                  >
-                    <Check className="w-4 h-4 text-medical-600 dark:text-medical-400" />
-                  </button>
-                  <button
-                    onClick={handleCancelEditTitle}
-                    className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
-                    aria-label="Cancelar"
-                  >
-                    <X className="w-4 h-4 text-gray-500" />
-                  </button>
-                </div>
-              ) : (
+          {/* Title - Editable */}
+          <div className="flex-1 min-w-0 flex items-center gap-2">
+            {isEditingTitle ? (
+              <div className="flex items-center gap-2 flex-1">
+                <input
+                  ref={titleInputRef}
+                  type="text"
+                  value={editedTitle}
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveTitle();
+                    else if (e.key === 'Escape') handleCancelEditTitle();
+                  }}
+                  className="flex-1 text-sm font-medium text-white bg-white/5 border border-[#D4FF00]/50 px-3 py-1.5 focus:outline-none focus:border-[#D4FF00]"
+                  maxLength={255}
+                />
                 <button
-                  onClick={handleStartEditTitle}
-                  className="group flex items-center gap-2 min-w-0 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg px-2 py-1 transition-colors"
-                  disabled={sessionId === 'new'}
-                  title={sessionId === 'new' ? 'Envía un mensaje para crear la conversación' : 'Haz clic para editar el título'}
+                  onClick={handleSaveTitle}
+                  className="p-1.5 text-[#D4FF00] hover:bg-[#D4FF00]/10 transition-colors"
+                  aria-label="Guardar título"
                 >
-                  <h1 className="text-sm font-medium text-gray-600 dark:text-gray-300 truncate">
-                    {conversationTitle}
-                  </h1>
-                  {isSavingTitle ? (
-                    <Loader2 className="w-3 h-3 animate-spin text-medical-500 flex-shrink-0" />
-                  ) : sessionId !== 'new' && (
-                    <Edit2 className="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                  )}
+                  <Check className="w-4 h-4" />
                 </button>
-              )}
-            </div>
-
-            {/* Right side - Actions */}
-            <button
-              onClick={handleNewChat}
-              className="p-2 hover:bg-medical-50 dark:hover:bg-medical-900/30 rounded-xl transition-colors"
-              aria-label="Nueva conversación"
-            >
-              <Plus className="w-5 h-5 text-medical-600 dark:text-medical-400" />
-            </button>
-            <button
-              onClick={() => setIsFeedbackOpen(true)}
-              className="p-2 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 rounded-xl transition-colors"
-              aria-label="Dar feedback"
-            >
-              <Star className="w-5 h-5 text-yellow-500" />
-            </button>
-            <ThemeToggle />
-          </div>
-        </motion.div>
-
-        {/* Messages Area */}
-        <motion.div
-          ref={messagesContainerRef}
-          variants={{
-            initial: { opacity: 0 },
-            animate: {
-              opacity: 1,
-              transition: {
-                duration: 0.3,
-                ease: [0.0, 0.0, 0.2, 1],
-                delay: 0.1,
-              },
-            },
-          }}
-          className="flex-1 overflow-y-auto px-4 md:px-6 py-4 relative"
-        >
-          <div className="max-w-4xl mx-auto space-y-4">
-            {messages.length === 0 ? (
-              <EmptyState onPromptClick={handleSendMessage} />
+                <button
+                  onClick={handleCancelEditTitle}
+                  className="p-1.5 text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                  aria-label="Cancelar"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             ) : (
-              <AnimatePresence mode="popLayout">
-                {messages.map((message, index) => (
-                  <motion.div
-                    key={message.id}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                      transition: {
-                        duration: 0.3,
-                        ease: [0.0, 0.0, 0.2, 1],
-                      },
-                    }}
-                  >
-                    <ChatMessage
-                      message={message}
-                      index={index}
-                      onRetry={handleRetryMessage}
-                      onRegenerate={handleRegenerateMessage}
-                    />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            )}
-
-            {/* Show skeleton only if typing and last message is from user (not yet streaming) */}
-                {isTyping && messages.length > 0 && messages[messages.length - 1]?.role === 'user' && (
-                  <MessageSkeleton lines={4} />
+              <button
+                onClick={handleStartEditTitle}
+                className="group flex items-center gap-2 min-w-0 hover:bg-white/5 px-2 py-1 transition-colors"
+                disabled={sessionId === 'new'}
+                title={sessionId === 'new' ? 'Envía un mensaje para crear la conversación' : 'Haz clic para editar el título'}
+              >
+                <h1 className="text-sm font-light text-white/80 truncate">
+                  {conversationTitle}
+                </h1>
+                {isSavingTitle ? (
+                  <Loader2 className="w-3 h-3 animate-spin text-[#D4FF00] flex-shrink-0" />
+                ) : sessionId !== 'new' && (
+                  <Edit2 className="w-3 h-3 text-white/40 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                 )}
-
-            {/* Follow-up suggestions after last bot message */}
-            {!isTyping && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.isError && (
-              <FollowUpSuggestions
-                suggestions={generateFollowUpSuggestions(messages[messages.length - 1].content)}
-                onSelect={handleSendMessage}
-              />
+              </button>
             )}
-
-            <div ref={messagesEndRef} />
           </div>
 
-          {/* Scroll to Bottom Button */}
-          <AnimatePresence>
-            {showScrollButton && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.2 }}
-                onClick={scrollToBottom}
-                className="absolute bottom-4 right-4 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
-                aria-label="Ir al final"
-              >
-                <ArrowDown className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              </motion.button>
-            )}
-          </AnimatePresence>
-        </motion.div>
+          {/* Right side - Actions */}
+          <button
+            onClick={handleNewChat}
+            className="p-2 text-[#D4FF00] hover:bg-[#D4FF00]/10 transition-colors"
+            aria-label="Nueva conversación"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setIsFeedbackOpen(true)}
+            className="p-2 text-white/60 hover:text-[#D4FF00] hover:bg-[#D4FF00]/10 transition-colors"
+            aria-label="Dar feedback"
+          >
+            <Star className="w-5 h-5" />
+          </button>
+        </div>
+      </motion.header>
 
-        {/* Input Area */}
-        <motion.div
-          variants={{
-            initial: { opacity: 0.6 },
-            animate: {
-              opacity: 1,
-              transition: {
-                duration: 0.2,
-                ease: [0.0, 0.0, 0.2, 1],
-                delay: 0.2,
-              },
-            },
-          }}
-        >
-          <ChatInput onSend={handleSendMessage} disabled={isTyping} />
-        </motion.div>
+      {/* Messages Area */}
+      <motion.div
+        ref={messagesContainerRef}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+        className="flex-1 overflow-y-auto px-4 md:px-6 py-6 relative"
+      >
+        <div className="max-w-4xl mx-auto space-y-6">
+          {messages.length === 0 ? (
+            <EmptyState onPromptClick={handleSendMessage} />
+          ) : (
+            <AnimatePresence mode="popLayout">
+              {messages.map((message, index) => (
+                <motion.div
+                  key={message.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ChatMessage
+                    message={message}
+                    index={index}
+                    onRetry={handleRetryMessage}
+                    onRegenerate={handleRegenerateMessage}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
+
+          {/* Skeleton while loading */}
+          {isTyping && messages.length > 0 && messages[messages.length - 1]?.role === 'user' && (
+            <MessageSkeleton lines={4} />
+          )}
+
+          {/* Follow-up suggestions */}
+          {!isTyping && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.isError && (
+            <FollowUpSuggestions
+              suggestions={generateFollowUpSuggestions(messages[messages.length - 1].content)}
+              onSelect={handleSendMessage}
+            />
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Scroll to Bottom Button */}
+        <AnimatePresence>
+          {showScrollButton && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.2 }}
+              onClick={scrollToBottom}
+              className="absolute bottom-4 right-4 p-3 bg-white/10 border border-white/20 hover:border-[#D4FF00]/50 hover:bg-white/5 transition-all"
+              aria-label="Ir al final"
+            >
+              <ArrowDown className="w-5 h-5 text-white/60" />
+            </motion.button>
+          )}
+        </AnimatePresence>
       </motion.div>
 
+      {/* Input Area - Alba style */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.2 }}
+        className="border-t border-white/10 px-4 md:px-6 lg:px-10 py-4"
+      >
+        <div className="max-w-4xl mx-auto">
+          <div
+            className={`
+              flex items-center gap-3 px-5 py-4 border transition-all duration-300
+              ${isFocused
+                ? 'border-[#D4FF00] bg-white/5'
+                : 'border-white/20 hover:border-white/40'
+              }
+            `}
+          >
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder="Escribe tu mensaje..."
+              disabled={isTyping}
+              className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-white/30 text-base disabled:opacity-50"
+            />
+
+            <button
+              onClick={handleInputSend}
+              disabled={!inputValue.trim() || isTyping}
+              className="px-5 py-2.5 bg-[#D4FF00] hover:bg-[#E5FF4D] text-black text-sm font-semibold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
+              aria-label="Enviar mensaje"
+            >
+              <span className="hidden sm:inline">Enviar</span>
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </motion.div>
 
       {/* History Panel */}
       <HistoryPanel
@@ -620,4 +591,3 @@ export default function ChatPage() {
     </div>
   );
 }
-

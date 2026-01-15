@@ -1,17 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send } from 'lucide-react';
-import { LiquidButton } from '@/components/ui/liquid-glass-button';
-import { GradientBlobBg } from '@/components/ui/gradient-blob-bg';
-
-// Lazy load Three.js component to reduce initial bundle size (kept for optional use)
-const DottedSurface = dynamic(
-  () => import('@/components/ui/dotted-surface').then(mod => ({ default: mod.DottedSurface })),
-  { ssr: false }
-);
+import { Send, ArrowUpRight } from 'lucide-react';
 
 // Hook to detect mobile viewport
 function useIsMobile() {
@@ -72,9 +63,6 @@ const allPrompts = [
 // Different rotation intervals for each position (in milliseconds)
 const rotationIntervals = [4000, 5500, 7000, 6000, 5000, 4500];
 
-// Welcome message
-const welcomeMessage = "Hola 👋 ¿En qué puedo asistirte?";
-
 interface WelcomeScreenProps {
   onPromptClick: (text: string) => void;
   isExiting?: boolean;
@@ -87,7 +75,6 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
   const isMobile = useIsMobile();
 
   // Track current prompt index for each position (4 on mobile, 6 on desktop)
-  // Spread indices across the array to show variety (array has 29 items)
   const [promptIndices, setPromptIndices] = useState<number[]>([0, 5, 11, 16, 22, 27]);
 
   // Show fewer prompts on mobile
@@ -109,16 +96,14 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
 
   // Set up rotation intervals for each prompt position
   useEffect(() => {
-    if (prefersReducedMotion) return; // Don't rotate if user prefers reduced motion
+    if (prefersReducedMotion) return;
 
     const intervals: NodeJS.Timeout[] = [];
 
-    // Create an interval for each position with different timing
     promptIndices.forEach((_, position) => {
       const interval = setInterval(() => {
         setPromptIndices(prev => {
           const newIndices = [...prev];
-          // Move to next prompt in the pool, wrapping around
           newIndices[position] = (newIndices[position] + 1) % allPrompts.length;
           return newIndices;
         });
@@ -127,7 +112,6 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
       intervals.push(interval);
     });
 
-    // Cleanup all intervals on unmount
     return () => {
       intervals.forEach(interval => clearInterval(interval));
     };
@@ -156,104 +140,115 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
       initial="initial"
       animate={isExiting ? "exit" : "animate"}
       exit="exit"
-      className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center px-4 pt-20 pb-8 sm:px-6 sm:pt-12 sm:pb-12 relative overflow-hidden"
+      className="min-h-screen bg-[#0D0D0D] flex flex-col px-6 md:px-12 lg:px-16 pt-24 pb-12 relative overflow-hidden"
     >
-      {/* Alba Gradient Blob Background */}
-      <GradientBlobBg opacity={0.5} />
+      {/* Subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0D0D0D]/50 pointer-events-none" />
 
-      <div className="max-w-6xl w-full text-center relative z-10">
-        {/* Title & Subtitle - exits first */}
+      {/* Main content */}
+      <div className="max-w-4xl mx-auto w-full relative z-10 flex-1 flex flex-col">
+        {/* Title section */}
         <motion.div
           variants={{
-            initial: { opacity: 1, y: 0 },
-            animate: { opacity: 1, y: 0 },
-            exit: {
-              opacity: 0,
-              y: -20,
-              transition: {
-                duration: 0.25,
-                ease: [0.4, 0.0, 0.2, 1]
-              }
-            }
+            initial: { opacity: 0, y: 20 },
+            animate: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+            exit: { opacity: 0, y: -20, transition: { duration: 0.25 } }
           }}
+          className="mb-12 md:mb-16"
         >
-          {/* Welcome Message */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-5 tracking-tight leading-tight px-2">
-            <span>Hola 👋</span>
+          {/* Section indicator */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-2 h-2 rounded-full bg-[#D4FF00]" />
+            <span className="text-sm font-medium text-white/50 uppercase tracking-wider">
+              Asistente Nutricional
+            </span>
+          </div>
+
+          {/* Main headline */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-light text-white leading-tight mb-4">
+            Hola, ¿en qué puedo
             <br />
-            <span>¿En qué puedo </span>
-            <span className="bg-gradient-to-r from-medical-500 to-medical-400 bg-clip-text text-transparent">
-              asistirte?
-            </span>
+            <span className="text-[#D4FF00]">asistirte</span> hoy?
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-gray-500 dark:text-gray-400 mb-8 sm:mb-10 md:mb-12 px-2">
-            Tu asistente de{' '}
-            <span className="text-medical-600 dark:text-medical-400 font-medium">
-              nutrición renal
-            </span>
+
+          <p className="text-lg text-white/50 max-w-xl">
+            Tu guía personalizada de nutrición renal. Pregunta sobre dietas, alimentos permitidos y recomendaciones.
           </p>
         </motion.div>
 
-        {/* Rotating Prompt Buttons - 4 on mobile, 6 on desktop */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 max-w-3xl mx-auto mb-6 sm:mb-8 px-2 sm:px-0">
-          {visiblePromptIndices.map((promptIndex, position) => {
-            const prompt = allPrompts[promptIndex % allPrompts.length];
-            if (!prompt) return null;
-            return (
-              <div key={position} className="relative min-h-[44px] sm:min-h-[48px]">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={`${position}-${promptIndex}`}
-                    initial={!prefersReducedMotion ? { opacity: 0, y: 10 } : { opacity: 1, y: 0 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={!prefersReducedMotion ? { opacity: 0, y: -10 } : {}}
-                    transition={{
-                      duration: 0.3,
-                      ease: [0.4, 0.0, 0.2, 1]
-                    }}
-                    className="absolute inset-0"
-                  >
-                    <LiquidButton
-                      onClick={() => handlePromptClick(prompt)}
-                      className="text-left px-3 py-2.5 sm:px-5 sm:py-4 text-sm sm:text-base text-gray-700 font-medium min-h-[44px] sm:min-h-[48px] w-full"
-                    >
-                      {prompt}
-                    </LiquidButton>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Input Field - subtle fade */}
+        {/* Prompt buttons grid */}
         <motion.div
           variants={{
-            initial: { opacity: 1 },
-            animate: { opacity: 1 },
-            exit: {
-              opacity: 0.6,
-              transition: {
-                duration: 0.3,
-                ease: [0.4, 0.0, 0.2, 1],
-                delay: 0.2
-              }
-            }
+            initial: { opacity: 0 },
+            animate: { opacity: 1, transition: { delay: 0.2, duration: 0.4 } },
+            exit: { opacity: 0, transition: { duration: 0.2 } }
           }}
-          className="max-w-3xl mx-auto px-2 sm:px-0"
+          className="mb-10"
         >
-          <motion.div
-            className="flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2.5 sm:py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full shadow-sm transition-all"
-            animate={isFocused ? {
-              scale: 1.02,
-              borderColor: '#1A4D5C',
-              boxShadow: '0 0 0 3px rgba(26, 77, 92, 0.15)',
-            } : {
-              scale: 1,
-              borderColor: 'var(--border-color, #e5e7eb)',
-              boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-            }}
-            transition={{ duration: 0.2 }}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-2 h-2 rounded-full bg-white/30" />
+            <span className="text-xs font-medium text-white/40 uppercase tracking-wider">
+              Preguntas sugeridas
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {visiblePromptIndices.map((promptIndex, position) => {
+              const prompt = allPrompts[promptIndex % allPrompts.length];
+              if (!prompt) return null;
+              return (
+                <div key={position} className="relative min-h-[56px]">
+                  <AnimatePresence mode="wait">
+                    <motion.button
+                      key={`${position}-${promptIndex}`}
+                      initial={!prefersReducedMotion ? { opacity: 0, y: 10 } : { opacity: 1, y: 0 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={!prefersReducedMotion ? { opacity: 0, y: -10 } : {}}
+                      transition={{
+                        duration: 0.3,
+                        ease: [0.4, 0.0, 0.2, 1]
+                      }}
+                      onClick={() => handlePromptClick(prompt)}
+                      className="absolute inset-0 w-full text-left px-5 py-4 border border-white/10 hover:border-[#D4FF00]/50 hover:bg-white/5 transition-all duration-300 group"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-sm md:text-base text-white/70 group-hover:text-white transition-colors">
+                          {prompt}
+                        </span>
+                        <ArrowUpRight className="w-4 h-4 text-white/30 group-hover:text-[#D4FF00] transition-colors flex-shrink-0" />
+                      </div>
+                    </motion.button>
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Input field - push to bottom */}
+        <motion.div
+          variants={{
+            initial: { opacity: 0, y: 20 },
+            animate: { opacity: 1, y: 0, transition: { delay: 0.3, duration: 0.4 } },
+            exit: { opacity: 0.6, transition: { duration: 0.3, delay: 0.2 } }
+          }}
+          className="mt-auto"
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-2 h-2 rounded-full bg-white/30" />
+            <span className="text-xs font-medium text-white/40 uppercase tracking-wider">
+              Tu pregunta
+            </span>
+          </div>
+
+          <div
+            className={`
+              flex items-center gap-3 px-5 py-4 border transition-all duration-300
+              ${isFocused
+                ? 'border-[#D4FF00] bg-white/5'
+                : 'border-white/20 hover:border-white/40'
+              }
+            `}
           >
             <input
               type="text"
@@ -263,35 +258,29 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               placeholder={isMobile ? "Escribe tu pregunta..." : "Escribe tu pregunta sobre nutrición renal aquí..."}
-              className="flex-1 bg-transparent border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none text-sm sm:text-base text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 min-w-0"
+              className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-white/30 text-base"
             />
 
             <button
               onClick={handleSend}
               disabled={!input.trim()}
-              className="p-2.5 bg-medical-500 hover:bg-medical-600 rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0 shadow-lg shadow-medical-500/25"
+              className="px-5 py-2.5 bg-[#D4FF00] hover:bg-[#E5FF4D] text-black text-sm font-semibold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
               aria-label="Enviar mensaje"
             >
-              <Send className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              <span className="hidden sm:inline">Enviar</span>
+              <Send className="w-4 h-4" />
             </button>
-          </motion.div>
+          </div>
         </motion.div>
 
         {/* Disclaimer */}
         <motion.p
           variants={{
-            initial: { opacity: 1 },
-            animate: { opacity: 1 },
-            exit: {
-              opacity: 0,
-              transition: {
-                duration: 0.2,
-                ease: [0.4, 0.0, 0.2, 1],
-                delay: 0.3
-              }
-            }
+            initial: { opacity: 0 },
+            animate: { opacity: 1, transition: { delay: 0.5, duration: 0.4 } },
+            exit: { opacity: 0, transition: { duration: 0.2, delay: 0.3 } }
           }}
-          className="text-xs text-gray-600 dark:text-gray-400 mt-6 sm:mt-8 md:mt-10 max-w-2xl mx-auto px-4"
+          className="text-xs text-white/30 mt-6 max-w-2xl"
         >
           Este chatbot proporciona información educativa únicamente. Siempre consulta con tu médico antes de realizar cambios en tu dieta.
         </motion.p>

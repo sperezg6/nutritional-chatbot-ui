@@ -31,9 +31,8 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
   const [isBookmarked, setIsBookmarked] = useState(false)
   const { showToast } = useToast()
 
-  // Detect if message is a meal plan (contains specific markers)
+  // Detect if message is a meal plan
   const isMealPlan = !isUser && (
-    // Check for meal plan structure: daily limits + meal sections
     (message.content.includes('Límites Diarios') || message.content.includes('📊')) &&
     (message.content.includes('Desayuno') || message.content.includes('Plan Semanal') || message.content.includes('🌅'))
   )
@@ -55,7 +54,6 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
           text: message.content,
         })
       } else {
-        // Fallback: copy to clipboard
         await navigator.clipboard.writeText(message.content)
         showToast("Enlace copiado para compartir", "success")
       }
@@ -73,7 +71,6 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
   const handleBookmark = useCallback(() => {
     setIsBookmarked(prev => {
       const newValue = !prev
-      // In a real app, this would save to localStorage or backend
       const bookmarks = JSON.parse(localStorage.getItem('chat-bookmarks') || '[]')
       if (newValue) {
         bookmarks.push({
@@ -108,10 +105,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
         throw new Error('Failed to generate PDF')
       }
 
-      // Get PDF blob
       const blob = await response.blob()
-
-      // Create download link
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -130,36 +124,40 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
   return (
     <motion.div
       className={`flex items-start gap-3 ${isUser ? 'justify-end' : ''}`}
-      initial={{ opacity: 0, x: isUser ? 30 : -30 }}
+      initial={{ opacity: 0, x: isUser ? 20 : -20 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
     >
-      {/* Bot Avatar */}
+      {/* Bot Avatar - Alba style */}
       {!isUser && (
-        <div className={`w-8 h-8 rounded-full border-2 ${isError ? 'border-red-100 dark:border-red-900 bg-red-50 dark:bg-red-950' : 'border-medical-100 dark:border-medical-800 bg-white dark:bg-gray-800'} flex items-center justify-center flex-shrink-0`}>
+        <div className={`w-8 h-8 flex items-center justify-center flex-shrink-0 ${
+          isError
+            ? 'border border-red-500/30 bg-red-500/10'
+            : 'border border-[#D4FF00]/30 bg-[#D4FF00]/10'
+        }`}>
           {isError ? (
-            <AlertCircle className="w-4 h-4 text-red-500" />
+            <AlertCircle className="w-4 h-4 text-red-400" />
           ) : (
-            <Leaf className="w-4 h-4 text-medical-500 dark:text-medical-400" />
+            <Leaf className="w-4 h-4 text-[#D4FF00]" />
           )}
         </div>
       )}
 
-      {/* Message Bubble */}
+      {/* Message Content */}
       <div className="flex flex-col max-w-[80%]">
         <div
           className={`
             ${isUser
-              ? 'bg-gradient-to-br from-medical-500 to-medical-600 rounded-2xl rounded-br-md shadow-lg shadow-medical-500/30'
+              ? 'bg-[#D4FF00] text-black'
               : isError
-              ? 'bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-2xl rounded-tl-md shadow-sm'
-              : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl rounded-tl-md shadow-md'
+              ? 'bg-red-500/10 border border-red-500/30'
+              : 'bg-white/5 border border-white/10'
             }
             px-5 py-4
           `}
         >
           {isUser ? (
-            <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-white font-medium">
+            <p className="text-[15px] leading-relaxed whitespace-pre-wrap font-medium">
               {message.content}
             </p>
           ) : (
@@ -167,64 +165,66 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
               <LazyMarkdownGfm
                 content={message.content}
                 className={`
-                  prose prose-sm max-w-none dark:prose-invert
-                  ${isError ? 'text-red-700 dark:text-red-400' : 'text-gray-800 dark:text-gray-200'}
-                  prose-headings:font-semibold prose-headings:text-gray-900 dark:prose-headings:text-white
-                  prose-h2:text-lg prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-gray-200 dark:prose-h2:border-gray-700 prose-h2:pb-2
-                  prose-h3:text-base prose-h3:mt-6 prose-h3:mb-3
-                  prose-p:my-3 prose-p:leading-relaxed
-                  prose-ul:my-4 prose-ul:space-y-1.5 prose-ul:list-none
-                  prose-ol:my-4 prose-ol:space-y-1.5 prose-ol:list-none
-                  prose-li:my-1 prose-li:leading-relaxed prose-li:pl-0
-                  prose-hr:my-8 prose-hr:border-gray-200 dark:prose-hr:border-gray-700
+                  prose prose-sm max-w-none prose-invert
+                  ${isError ? 'text-red-300' : 'text-white/80'}
+                  prose-headings:font-light prose-headings:text-white
+                  prose-h2:text-lg prose-h2:mt-6 prose-h2:mb-3 prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-2
+                  prose-h3:text-base prose-h3:mt-4 prose-h3:mb-2
+                  prose-p:my-2 prose-p:leading-relaxed
+                  prose-ul:my-3 prose-ul:space-y-1 prose-ul:list-none
+                  prose-ol:my-3 prose-ol:space-y-1 prose-ol:list-none
+                  prose-li:my-0.5 prose-li:leading-relaxed prose-li:pl-0
+                  prose-hr:my-6 prose-hr:border-white/10
+                  prose-strong:text-white prose-strong:font-medium
+                  prose-a:text-[#D4FF00] prose-a:no-underline hover:prose-a:underline
                 `}
               />
 
-              {/* Action Buttons - only for non-error bot messages */}
+              {/* Action Buttons - Alba style */}
               {!isError && (
-                <div className="flex flex-wrap gap-1.5 mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-white/10">
                   <button
                     onClick={handleCopy}
-                    className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all hover:scale-105"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white/60 bg-white/5 border border-white/10 hover:border-white/30 hover:text-white transition-all"
                     aria-label="Copiar mensaje"
                   >
-                    <Copy className="w-4 h-4" />
+                    <Copy className="w-3.5 h-3.5" />
                     <span>Copiar</span>
                   </button>
 
                   <button
                     onClick={handleShare}
-                    className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all hover:scale-105"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white/60 bg-white/5 border border-white/10 hover:border-white/30 hover:text-white transition-all"
                     aria-label="Compartir mensaje"
                   >
-                    <Share2 className="w-4 h-4" />
+                    <Share2 className="w-3.5 h-3.5" />
                     <span>Compartir</span>
                   </button>
 
                   {onRegenerate && (
                     <button
                       onClick={handleRegenerate}
-                      className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all hover:scale-105"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white/60 bg-white/5 border border-white/10 hover:border-white/30 hover:text-white transition-all"
                       aria-label="Regenerar respuesta"
                     >
-                      <RotateCcw className="w-4 h-4" />
+                      <RotateCcw className="w-3.5 h-3.5" />
                       <span>Regenerar</span>
                     </button>
                   )}
 
                   <button
                     onClick={handleBookmark}
-                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg transition-all hover:scale-105 ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all ${
                       isBookmarked
-                        ? 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30'
-                        : 'text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        ? 'text-[#D4FF00] bg-[#D4FF00]/10 border border-[#D4FF00]/30'
+                        : 'text-white/60 bg-white/5 border border-white/10 hover:border-white/30 hover:text-white'
                     }`}
                     aria-label={isBookmarked ? "Quitar de guardados" : "Guardar mensaje"}
                   >
                     {isBookmarked ? (
-                      <BookmarkCheck className="w-4 h-4" />
+                      <BookmarkCheck className="w-3.5 h-3.5" />
                     ) : (
-                      <Bookmark className="w-4 h-4" />
+                      <Bookmark className="w-3.5 h-3.5" />
                     )}
                     <span>{isBookmarked ? 'Guardado' : 'Guardar'}</span>
                   </button>
@@ -234,11 +234,11 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                     <button
                       onClick={handleDownloadPDF}
                       disabled={isDownloading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-green-600 hover:bg-green-700 disabled:bg-green-400 rounded-lg transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#D4FF00] hover:bg-[#E5FF4D] disabled:opacity-50 transition-all uppercase tracking-wider"
                       aria-label="Descargar PDF"
                     >
                       <Download className="w-3.5 h-3.5" />
-                      <span>{isDownloading ? 'Generando...' : 'Descargar PDF'}</span>
+                      <span>{isDownloading ? 'Generando...' : 'PDF'}</span>
                     </button>
                   )}
                 </div>
@@ -248,7 +248,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
 
           {/* Error Details */}
           {isError && message.errorMessage && (
-            <p className="text-sm text-red-600 mt-2 border-t border-red-200 pt-2">
+            <p className="text-sm text-red-300 mt-2 pt-2 border-t border-red-500/20">
               {message.errorMessage}
             </p>
           )}
@@ -257,7 +257,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
           {isError && message.canRetry && onRetry && (
             <button
               onClick={() => onRetry(message.id)}
-              className="mt-3 flex items-center gap-2 text-sm text-red-600 hover:text-red-700 font-medium transition-colors"
+              className="mt-3 flex items-center gap-2 text-sm text-red-300 hover:text-red-200 font-medium transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
               Reintentar
@@ -265,7 +265,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
           )}
         </div>
 
-        <span className={`text-[11px] ${isError ? 'text-red-400' : 'text-gray-400 dark:text-gray-500'} mt-1.5 ${isUser ? 'text-right' : 'text-left'} px-1`}>
+        <span className={`text-[11px] ${isError ? 'text-red-400/60' : 'text-white/30'} mt-1.5 ${isUser ? 'text-right' : 'text-left'} px-1`}>
           {message.timestamp.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -273,10 +273,10 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
         </span>
       </div>
 
-      {/* User Avatar */}
+      {/* User Avatar - Alba style */}
       {isUser && (
-        <div className="w-8 h-8 rounded-full border-2 border-medical-100 dark:border-medical-800 bg-medical-500 flex items-center justify-center flex-shrink-0">
-          <User className="w-4 h-4 text-white" />
+        <div className="w-8 h-8 border border-[#D4FF00]/30 bg-[#D4FF00] flex items-center justify-center flex-shrink-0">
+          <User className="w-4 h-4 text-black" />
         </div>
       )}
     </motion.div>

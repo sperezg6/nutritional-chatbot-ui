@@ -21,44 +21,23 @@ const config: Config = {
           foreground: "hsl(var(--popover-foreground))",
         },
         primary: {
-          50: '#EFF6FF',
-          100: '#DBEAFE',
-          200: '#BFDBFE',
-          300: '#93C5FD',
-          400: '#60A5FA',
-          500: '#3B82F6',
-          600: '#2563EB',
-          700: '#1D4ED8',
+          50: '#F7FEE7',
+          100: '#ECFCCB',
+          200: '#D9F99D',
+          300: '#BEF264',
+          400: '#D4FF00',
+          500: '#D4FF00',  // Alba lime
+          600: '#B8E600',
+          700: '#9ACD00',
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
-        // Alba clinic teal palette
-        medical: {
-          50: '#E6F0F2',
-          100: '#C0D9DE',
-          200: '#96C0C9',
-          300: '#6BA7B4',
-          400: '#4B8E9F',
-          500: '#1A4D5C',  // Primary teal from Alba
-          600: '#164350',  // Hover state
-          700: '#123844',
-          800: '#0E2D37',
-          900: '#0A222B',
-        },
-        // Alba gold accent
+        // Alba dark palette
         alba: {
-          gold: {
-            50: '#FDF8EE',
-            100: '#FAF0DC',
-            200: '#F5E1B9',
-            300: '#F0D296',
-            400: '#EBC373',
-            500: '#E8B86D',  // Primary gold from Alba
-            600: '#D9A555',
-            700: '#C99240',
-            800: '#A87A34',
-            900: '#876228',
-          },
+          dark: '#0D0D0D',
+          lime: '#D4FF00',
+          'lime-hover': '#E5FF4D',
+          creme: '#F5F5F0',
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -69,12 +48,12 @@ const config: Config = {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          50: '#F0FDF4',
-          100: '#DCFCE7',
-          200: '#BBF7D0',
-          300: '#86EFAC',
-          400: '#4ADE80',
-          500: '#22C55E',
+          50: '#F7FEE7',
+          100: '#ECFCCB',
+          200: '#D9F99D',
+          300: '#BEF264',
+          400: '#D4FF00',
+          500: '#D4FF00',
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
@@ -91,6 +70,19 @@ const config: Config = {
           "3": "hsl(var(--chart-3))",
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
+        },
+        // Medical green palette
+        medical: {
+          50: 'var(--medical-50)',
+          100: 'var(--medical-100)',
+          200: 'var(--medical-200)',
+          300: 'var(--medical-300)',
+          400: 'var(--medical-400)',
+          500: 'var(--medical-500)',
+          600: 'var(--medical-600)',
+          700: 'var(--medical-700)',
+          800: 'var(--medical-800)',
+          900: 'var(--medical-900)',
         },
       },
       fontFamily: {

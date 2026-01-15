@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { Star, MessageSquare, Leaf } from "lucide-react"
+import { Star, MessageSquare, ArrowUpRight } from "lucide-react"
 import { WelcomeScreen } from "@/components/chat/welcome-screen"
 import { FeedbackModal } from "@/components/chat/feedback-modal"
 import { HistoryPanel } from "@/components/chat/history-panel"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { generateSessionId } from "@/lib/session"
 import {
   Dialog,
@@ -44,74 +43,78 @@ export default function Home() {
   }
 
   return (
-    <div className="relative min-h-screen">
-      {/* Minimal Header */}
+    <div className="relative min-h-screen bg-[#0D0D0D]">
+      {/* Alba-style Minimal Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="fixed top-0 left-0 right-0 z-50 px-4 py-3"
+        className="fixed top-0 left-0 right-0 z-50 px-6 md:px-10 lg:px-16 py-6"
       >
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          {/* Left - History */}
-          <motion.button
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Left - History button */}
+          <button
             onClick={() => setIsHistoryOpen(true)}
-            className="p-2.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
             aria-label="Ver historial"
           >
-            <MessageSquare className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-          </motion.button>
+            <MessageSquare className="w-5 h-5" />
+            <span className="text-sm font-medium hidden sm:inline">Historial</span>
+          </button>
 
           {/* Center - Logo */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="flex items-center gap-2.5"
+          <a
+            href="https://albadialisis.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-base font-semibold uppercase tracking-[0.1em] text-white hover:text-white/80 transition-colors"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-medical-500 to-medical-600 rounded-xl flex items-center justify-center shadow-sm">
-              <Leaf className="w-5 h-5 text-white" strokeWidth={1.5} />
-            </div>
-            <span className="text-lg font-semibold text-medical-600 dark:text-medical-400">
-              Alba
-            </span>
-          </motion.div>
+            ALBA
+          </a>
 
-          {/* Right - Actions */}
-          <div className="flex items-center gap-2">
-            <motion.button
-              onClick={() => setIsFeedbackOpen(true)}
-              className="p-2.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Dar feedback"
-            >
-              <Star className="w-5 h-5 text-yellow-500" />
-            </motion.button>
-            <ThemeToggle />
-          </div>
+          {/* Right - Feedback */}
+          <button
+            onClick={() => setIsFeedbackOpen(true)}
+            className="flex items-center gap-2 text-white/60 hover:text-[#D4FF00] transition-colors"
+            aria-label="Dar feedback"
+          >
+            <Star className="w-5 h-5" />
+            <span className="text-sm font-medium hidden sm:inline">Feedback</span>
+          </button>
         </div>
       </motion.header>
 
       <WelcomeScreen onPromptClick={handleSendMessage} isExiting={false} />
 
-      {/* Disclaimer Dialog */}
+      {/* Disclaimer Dialog - Alba styled */}
       <Dialog open={showDisclaimer} onOpenChange={setShowDisclaimer}>
-        <DialogContent onClose={handleDisclaimerClose}>
+        <DialogContent
+          onClose={handleDisclaimerClose}
+          className="bg-[#0D0D0D] border border-white/10 text-white max-w-lg"
+        >
           <DialogHeader>
-            <DialogTitle className="text-xl">Aviso Médico Importante</DialogTitle>
-            <DialogDescription className="text-base leading-relaxed mt-4">
-              Este chatbot proporciona educación nutricional para la enfermedad renal. {" "}
-              <strong>NO es un sustituto de consejo médico profesional</strong>. Siempre
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-2 h-2 rounded-full bg-[#D4FF00]" />
+              <span className="text-xs font-medium text-white/50 uppercase tracking-wider">
+                Aviso Importante
+              </span>
+            </div>
+            <DialogTitle className="text-2xl font-light text-white">
+              Información Médica
+            </DialogTitle>
+            <DialogDescription className="text-base leading-relaxed mt-4 text-white/60">
+              Este chatbot proporciona educación nutricional para la enfermedad renal.{" "}
+              <strong className="text-white">NO es un sustituto de consejo médico profesional</strong>. Siempre
               consulta con tu nefrólogo o dietista registrado antes de realizar cambios
-              en tu dieta. La información proporcionada es solo con fines educativos.
+              en tu dieta.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-6">
-            <Button onClick={handleDisclaimerClose} className="w-full sm:w-auto">
-              Entiendo
+            <Button
+              onClick={handleDisclaimerClose}
+              className="w-full bg-[#D4FF00] hover:bg-[#E5FF4D] text-black font-semibold uppercase tracking-wider"
+            >
+              Entendido
             </Button>
           </DialogFooter>
         </DialogContent>

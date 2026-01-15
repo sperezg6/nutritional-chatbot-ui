@@ -8,11 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { MessageSquare } from "lucide-react"
+import { CheckCircle2, Loader2 } from "lucide-react"
 
 interface FeedbackModalProps {
   isOpen: boolean
@@ -79,60 +76,67 @@ export function FeedbackModal({ isOpen, onClose, conversationId }: FeedbackModal
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[480px] p-0 gap-0 overflow-hidden bg-white dark:bg-gray-900 border border-[var(--color-border)] dark:border-gray-800 rounded-2xl">
         {!submitted ? (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-xl text-center">
+          <div className="p-6 sm:p-8">
+            <DialogHeader className="space-y-3 mb-8">
+              <DialogTitle className="text-2xl font-semibold text-center text-gray-900 dark:text-white">
                 ¿Cómo fue tu experiencia?
               </DialogTitle>
-              <DialogDescription className="text-center text-base">
+              <DialogDescription className="text-center text-base text-[var(--color-muted)] dark:text-gray-400">
                 Tu retroalimentación nos ayuda a mejorar el asistente de nutrición
               </DialogDescription>
             </DialogHeader>
 
-            <div className="py-6">
+            <div className="py-4">
               <RatingInteraction onChange={setRating} />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <div className="space-y-2 mt-6">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Comentarios adicionales (opcional)
               </label>
-              <Textarea
+              <textarea
                 placeholder="Cuéntanos más sobre tu experiencia..."
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                className="min-h-[100px] resize-none"
+                className="w-full px-4 py-3 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 resize-none min-h-[100px] border-gray-200 dark:border-gray-700 hover:border-[var(--color-primary)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
               />
             </div>
 
-            <DialogFooter className="gap-2 sm:gap-0 mt-8">
-              <Button
-                variant="outline"
+            <div className="flex gap-3 mt-8">
+              <button
                 onClick={handleClose}
                 disabled={isSubmitting}
+                className="flex-1 px-5 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancelar
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={handleSubmit}
                 disabled={rating === 0 || isSubmitting}
-                className="bg-medical-500 hover:bg-medical-600"
+                className="flex-1 px-5 py-3 rounded-xl bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {isSubmitting ? "Enviando..." : "Enviar"}
-              </Button>
-            </DialogFooter>
-          </>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  "Enviar"
+                )}
+              </button>
+            </div>
+          </div>
         ) : (
-          <div className="py-12 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-              <MessageSquare className="h-8 w-8 text-green-600 dark:text-green-400" />
+          <div className="py-16 px-8 text-center">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-primary)]/10">
+              <CheckCircle2 className="h-8 w-8 text-[var(--color-primary)]" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               ¡Gracias por tu retroalimentación!
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-[var(--color-muted)] dark:text-gray-400">
               Tu opinión nos ayuda a mejorar
             </p>
           </div>

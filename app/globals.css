@@ -31,6 +31,19 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
+    /* Alba Brand Colors */
+    --color-primary: #1A4D5C;
+    --color-primary-light: #2A6B7C;
+    --color-primary-dark: #0F3540;
+    --color-secondary: #E8B86D;
+    --color-secondary-light: #F0CB8A;
+    --color-secondary-dark: #D4A050;
+    --color-background: #FAFAF8;
+    --color-surface: #FFFFFF;
+    --color-text: #1D2939;
+    --color-muted: #667085;
+    --color-border: #E4E7EC;
+
     /* Medical green palette from landing page */
     --medical-50: #E8F5F2;
     --medical-100: #C5E8E1;
@@ -64,6 +77,19 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
+    /* Alba Brand Colors - Dark mode */
+    --color-primary: #2A6B7C;
+    --color-primary-light: #3A8B9C;
+    --color-primary-dark: #1A4D5C;
+    --color-secondary: #F0CB8A;
+    --color-secondary-light: #F8DDA8;
+    --color-secondary-dark: #E8B86D;
+    --color-background: #0a0f12;
+    --color-surface: #121a1f;
+    --color-text: #f5f5f5;
+    --color-muted: #8a9ba8;
+    --color-border: rgba(255, 255, 255, 0.1);
 
     /* Dark mode medical green - adjusted for dark backgrounds */
     --medical-50: #18302C;
@@ -119,29 +145,47 @@ html {
   .animation-delay-1000 {
     animation-delay: 1000ms;
   }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out forwards;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Enhanced focus states for accessibility */
 @layer base {
   /* Visible focus ring for keyboard navigation */
   :focus-visible {
-    @apply outline-none ring-2 ring-medical-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900;
+    outline: none;
+    box-shadow: 0 0 0 2px var(--medical-500);
   }
 
   /* Remove focus ring for mouse clicks */
   :focus:not(:focus-visible) {
-    @apply outline-none ring-0;
+    outline: none;
+    box-shadow: none;
   }
 
   /* Button focus states */
   button:focus-visible,
   [role="button"]:focus-visible {
-    @apply ring-2 ring-medical-500 ring-offset-2;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px var(--medical-500);
   }
 
   /* Input focus states */
   input:focus-visible,
   textarea:focus-visible {
-    @apply ring-2 ring-medical-400 border-medical-400;
+    box-shadow: 0 0 0 2px var(--medical-400);
+    border-color: var(--medical-400);
   }
 }
