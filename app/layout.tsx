@@ -14,6 +14,10 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Asistente de Nutrición Renal",
   description: "Tu asistente de nutrición personalizado para el manejo de la enfermedad renal",
+  themeColor: "#2B3A42",
+  other: {
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+  },
 }
 
 export default function RootLayout({

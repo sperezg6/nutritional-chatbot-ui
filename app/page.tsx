@@ -43,7 +43,7 @@ export default function Home() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#0D0D0D]">
+    <div className="relative min-h-screen bg-[#2B3A42]">
       {/* Alba-style Minimal Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
@@ -75,7 +75,7 @@ export default function Home() {
           {/* Right - Feedback */}
           <button
             onClick={() => setIsFeedbackOpen(true)}
-            className="flex items-center gap-2 text-white/60 hover:text-[#D4FF00] transition-colors"
+            className="flex items-center gap-2 text-white/60 hover:text-[#E85A2C] transition-colors"
             aria-label="Dar feedback"
           >
             <Star className="w-5 h-5" />
@@ -90,11 +90,11 @@ export default function Home() {
       <Dialog open={showDisclaimer} onOpenChange={setShowDisclaimer}>
         <DialogContent
           onClose={handleDisclaimerClose}
-          className="bg-[#0D0D0D] border border-white/10 text-white max-w-lg"
+          className="bg-[#2B3A42] border border-white/10 text-white max-w-lg"
         >
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-2 h-2 rounded-full bg-[#D4FF00]" />
+              <div className="w-2 h-2 rounded-full bg-[#E85A2C]" />
               <span className="text-xs font-medium text-white/50 uppercase tracking-wider">
                 Aviso Importante
               </span>
@@ -112,7 +112,7 @@ export default function Home() {
           <DialogFooter className="mt-6">
             <Button
               onClick={handleDisclaimerClose}
-              className="w-full bg-[#D4FF00] hover:bg-[#E5FF4D] text-black font-semibold uppercase tracking-wider"
+              className="w-full bg-[#E85A2C] hover:bg-[#D14E22] text-black font-semibold uppercase tracking-wider"
             >
               Entendido
             </Button>

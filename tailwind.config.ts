@@ -21,23 +21,27 @@ const config: Config = {
           foreground: "hsl(var(--popover-foreground))",
         },
         primary: {
-          50: '#F7FEE7',
-          100: '#ECFCCB',
-          200: '#D9F99D',
-          300: '#BEF264',
-          400: '#D4FF00',
-          500: '#D4FF00',  // Alba lime
-          600: '#B8E600',
-          700: '#9ACD00',
+          50: '#FEF3E7',
+          100: '#FDDCCC',
+          200: '#FABD99',
+          300: '#F49B66',
+          400: '#F4A261',       // Soft Coral
+          500: '#E85A2C',       // Alba Orange
+          600: '#C94A1F',       // Deeper Orange
+          700: '#A63D18',
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
-        // Alba dark palette
+        // Alba warm palette
         alba: {
-          dark: '#0D0D0D',
-          lime: '#D4FF00',
-          'lime-hover': '#E5FF4D',
-          creme: '#F5F5F0',
+          dark: '#2B3A42',              // Warm Charcoal
+          'dark-light': '#364954',
+          orange: '#E85A2C',
+          'orange-light': '#F4A261',
+          'orange-dark': '#C94A1F',
+          sage: '#6B8E7D',              // Soft Sage
+          'sage-light': '#8BA99A',
+          cream: '#FAF9F6',
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -48,12 +52,12 @@ const config: Config = {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          50: '#F7FEE7',
-          100: '#ECFCCB',
-          200: '#D9F99D',
-          300: '#BEF264',
-          400: '#D4FF00',
-          500: '#D4FF00',
+          50: '#E8F0ED',
+          100: '#C5DDD4',
+          200: '#A1CABB',
+          300: '#8BA99A',       // Sage tones
+          400: '#6B8E7D',
+          500: '#567264',
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },

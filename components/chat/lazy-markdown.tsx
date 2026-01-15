@@ -44,47 +44,51 @@ function preprocessUrls(content: string): string {
 }
 
 // Custom components for markdown rendering
+// Note: Uses white text since chat is always on dark background
 const markdownComponents = {
   h1: ({ node, ...props }: any) => (
-    <h1 className="text-xl font-bold text-gray-900 dark:text-white mt-6 mb-6 pb-3 border-b-2 border-gray-300 dark:border-gray-600" {...props} />
+    <h1 className="text-xl font-semibold text-white mt-6 mb-4 pb-3 border-b border-white/10" {...props} />
   ),
   h2: ({ node, ...props }: any) => (
-    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mt-8 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700" {...props} />
+    <h2 className="text-lg font-semibold text-white mt-6 mb-3 pb-2 border-b border-white/10" {...props} />
   ),
   h3: ({ node, ...props }: any) => (
-    <h3 className="text-base font-semibold text-gray-900 dark:text-white mt-6 mb-3" {...props} />
+    <h3 className="text-base font-semibold text-white mt-5 mb-2" {...props} />
   ),
   ul: ({ node, ...props }: any) => (
-    <ul className="list-disc pl-6 space-y-1 [&>li]:marker:text-gray-400" {...props} />
+    <ul className="list-disc pl-6 space-y-1 [&>li]:marker:text-white/40" {...props} />
   ),
   ol: ({ node, ...props }: any) => (
     <ol className="list-decimal pl-6 space-y-1" {...props} />
   ),
   li: ({ node, children, ...props }: any) => (
-    <li className="pl-1" {...props}>{children}</li>
+    <li className="pl-1 text-white/80" {...props}>{children}</li>
   ),
   a: ({ node, href, children, ...props }: any) => (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-medical-600 hover:text-medical-700 underline font-medium"
+      className="text-[#E85A2C] hover:text-[#D14E22] underline font-medium"
       {...props}
     >
       {children}
     </a>
   ),
+  p: ({ node, children, ...props }: any) => (
+    <p className="text-white/80 my-2 leading-relaxed" {...props}>{children}</p>
+  ),
   strong: ({ node, children, ...props }: any) => {
     const text = String(children)
     if (text.endsWith(':')) {
       return (
-        <strong className="block mt-4 mb-2 text-gray-900 dark:text-white font-semibold" {...props}>
+        <strong className="block mt-4 mb-2 text-white font-semibold" {...props}>
           {children}
         </strong>
       )
     }
     return (
-      <strong className="text-gray-900 dark:text-white font-semibold" {...props}>
+      <strong className="text-white font-semibold" {...props}>
         {children}
       </strong>
     )

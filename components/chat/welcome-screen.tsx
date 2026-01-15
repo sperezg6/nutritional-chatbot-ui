@@ -140,10 +140,10 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
       initial="initial"
       animate={isExiting ? "exit" : "animate"}
       exit="exit"
-      className="min-h-screen bg-[#0D0D0D] flex flex-col px-6 md:px-12 lg:px-16 pt-24 pb-12 relative overflow-hidden"
+      className="min-h-screen bg-[#2B3A42] flex flex-col px-6 md:px-12 lg:px-16 pt-24 pb-12 relative overflow-hidden"
     >
       {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0D0D0D]/50 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#2B3A42]/50 pointer-events-none" />
 
       {/* Main content */}
       <div className="max-w-4xl mx-auto w-full relative z-10 flex-1 flex flex-col">
@@ -158,7 +158,7 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
         >
           {/* Section indicator */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-2 h-2 rounded-full bg-[#D4FF00]" />
+            <div className="w-2 h-2 rounded-full bg-[#E85A2C]" />
             <span className="text-sm font-medium text-white/50 uppercase tracking-wider">
               Asistente Nutricional
             </span>
@@ -168,7 +168,7 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-light text-white leading-tight mb-4">
             Hola, ¿en qué puedo
             <br />
-            <span className="text-[#D4FF00]">asistirte</span> hoy?
+            <span className="text-[#E85A2C]">asistirte</span> hoy?
           </h1>
 
           <p className="text-lg text-white/50 max-w-xl">
@@ -209,13 +209,13 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
                         ease: [0.4, 0.0, 0.2, 1]
                       }}
                       onClick={() => handlePromptClick(prompt)}
-                      className="absolute inset-0 w-full text-left px-5 py-4 border border-white/10 hover:border-[#D4FF00]/50 hover:bg-white/5 transition-all duration-300 group"
+                      className="absolute inset-0 w-full text-left px-5 py-4 border border-white/10 hover:border-[#E85A2C]/50 hover:bg-white/5 transition-all duration-300 group"
                     >
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-sm md:text-base text-white/70 group-hover:text-white transition-colors">
                           {prompt}
                         </span>
-                        <ArrowUpRight className="w-4 h-4 text-white/30 group-hover:text-[#D4FF00] transition-colors flex-shrink-0" />
+                        <ArrowUpRight className="w-4 h-4 text-white/30 group-hover:text-[#E85A2C] transition-colors flex-shrink-0" />
                       </div>
                     </motion.button>
                   </AnimatePresence>
@@ -245,7 +245,7 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
             className={`
               flex items-center gap-3 px-5 py-4 border transition-all duration-300
               ${isFocused
-                ? 'border-[#D4FF00] bg-white/5'
+                ? 'border-[#E85A2C] bg-white/5'
                 : 'border-white/20 hover:border-white/40'
               }
             `}
@@ -264,7 +264,7 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
             <button
               onClick={handleSend}
               disabled={!input.trim()}
-              className="px-5 py-2.5 bg-[#D4FF00] hover:bg-[#E5FF4D] text-black text-sm font-semibold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#E85A2C] hover:bg-[#D14E22] text-black text-sm font-semibold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
               aria-label="Enviar mensaje"
             >
               <span className="hidden sm:inline">Enviar</span>

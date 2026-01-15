@@ -133,12 +133,12 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
         <div className={`w-8 h-8 flex items-center justify-center flex-shrink-0 ${
           isError
             ? 'border border-red-500/30 bg-red-500/10'
-            : 'border border-[#D4FF00]/30 bg-[#D4FF00]/10'
+            : 'border border-[#E85A2C]/30 bg-[#E85A2C]/10'
         }`}>
           {isError ? (
             <AlertCircle className="w-4 h-4 text-red-400" />
           ) : (
-            <Leaf className="w-4 h-4 text-[#D4FF00]" />
+            <Leaf className="w-4 h-4 text-[#E85A2C]" />
           )}
         </div>
       )}
@@ -148,7 +148,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
         <div
           className={`
             ${isUser
-              ? 'bg-[#D4FF00] text-black'
+              ? 'bg-[#E85A2C] text-black'
               : isError
               ? 'bg-red-500/10 border border-red-500/30'
               : 'bg-white/5 border border-white/10'
@@ -176,7 +176,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                   prose-li:my-0.5 prose-li:leading-relaxed prose-li:pl-0
                   prose-hr:my-6 prose-hr:border-white/10
                   prose-strong:text-white prose-strong:font-medium
-                  prose-a:text-[#D4FF00] prose-a:no-underline hover:prose-a:underline
+                  prose-a:text-[#E85A2C] prose-a:no-underline hover:prose-a:underline
                 `}
               />
 
@@ -216,7 +216,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                     onClick={handleBookmark}
                     className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all ${
                       isBookmarked
-                        ? 'text-[#D4FF00] bg-[#D4FF00]/10 border border-[#D4FF00]/30'
+                        ? 'text-[#E85A2C] bg-[#E85A2C]/10 border border-[#E85A2C]/30'
                         : 'text-white/60 bg-white/5 border border-white/10 hover:border-white/30 hover:text-white'
                     }`}
                     aria-label={isBookmarked ? "Quitar de guardados" : "Guardar mensaje"}
@@ -234,7 +234,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                     <button
                       onClick={handleDownloadPDF}
                       disabled={isDownloading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#D4FF00] hover:bg-[#E5FF4D] disabled:opacity-50 transition-all uppercase tracking-wider"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#E85A2C] hover:bg-[#D14E22] disabled:opacity-50 transition-all uppercase tracking-wider"
                       aria-label="Descargar PDF"
                     >
                       <Download className="w-3.5 h-3.5" />
@@ -275,7 +275,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
 
       {/* User Avatar - Alba style */}
       {isUser && (
-        <div className="w-8 h-8 border border-[#D4FF00]/30 bg-[#D4FF00] flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 border border-[#E85A2C]/30 bg-[#E85A2C] flex items-center justify-center flex-shrink-0">
           <User className="w-4 h-4 text-black" />
         </div>
       )}

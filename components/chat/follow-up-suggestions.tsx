@@ -34,11 +34,11 @@ export function FollowUpSuggestions({ suggestions, onSelect, isVisible = true }:
             transition={{ duration: 0.2, delay: 0.05 * index }}
             onClick={() => onSelect(suggestion)}
             className="group inline-flex items-center gap-2 px-3 py-2 text-sm text-white/50 border border-white/10
-                       hover:text-white hover:border-[#D4FF00]/50 hover:bg-white/5
+                       hover:text-white hover:border-[#E85A2C]/50 hover:bg-white/5
                        transition-all duration-200 cursor-pointer"
           >
             <span>{suggestion}</span>
-            <ArrowUpRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#D4FF00] transition-all" />
+            <ArrowUpRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#E85A2C] transition-all" />
           </motion.button>
         ))}
       </div>

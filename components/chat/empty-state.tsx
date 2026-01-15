@@ -49,7 +49,7 @@ export function EmptyState({ onPromptClick }: EmptyStateProps) {
         transition={{ delay: 0.1 }}
         className="flex items-center gap-3 mb-8"
       >
-        <div className="w-2 h-2 rounded-full bg-[#D4FF00]" />
+        <div className="w-2 h-2 rounded-full bg-[#E85A2C]" />
         <span className="text-xs font-medium text-white/40 uppercase tracking-wider">
           Nueva conversación
         </span>
@@ -85,17 +85,17 @@ export function EmptyState({ onPromptClick }: EmptyStateProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 + index * 0.1 }}
             onClick={() => onPromptClick(tip.prompt)}
-            className="group flex items-start gap-4 p-5 border border-white/10 hover:border-[#D4FF00]/50 hover:bg-white/5 transition-all duration-300 text-left"
+            className="group flex items-start gap-4 p-5 border border-white/10 hover:border-[#E85A2C]/50 hover:bg-white/5 transition-all duration-300 text-left"
           >
-            <div className="w-10 h-10 border border-white/20 group-hover:border-[#D4FF00]/30 bg-white/5 group-hover:bg-[#D4FF00]/10 flex items-center justify-center flex-shrink-0 transition-all">
-              <tip.icon className="w-5 h-5 text-white/60 group-hover:text-[#D4FF00] transition-colors" />
+            <div className="w-10 h-10 border border-white/20 group-hover:border-[#E85A2C]/30 bg-white/5 group-hover:bg-[#E85A2C]/10 flex items-center justify-center flex-shrink-0 transition-all">
+              <tip.icon className="w-5 h-5 text-white/60 group-hover:text-[#E85A2C] transition-colors" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="font-medium text-white/80 group-hover:text-white text-sm transition-colors">
                   {tip.title}
                 </h3>
-                <ArrowUpRight className="w-4 h-4 text-white/20 group-hover:text-[#D4FF00] transition-colors flex-shrink-0" />
+                <ArrowUpRight className="w-4 h-4 text-white/20 group-hover:text-[#E85A2C] transition-colors flex-shrink-0" />
               </div>
               <p className="text-xs text-white/40 mt-1">
                 {tip.description}

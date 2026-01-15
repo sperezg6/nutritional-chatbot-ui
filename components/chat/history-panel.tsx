@@ -182,7 +182,7 @@ export function HistoryPanel({
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed left-0 top-0 bottom-0 w-80 max-w-[90vw] bg-[#0D0D0D] shadow-2xl z-50 flex flex-col border-r border-white/10"
+            className="fixed left-0 top-0 bottom-0 w-80 max-w-[90vw] bg-[#2B3A42] shadow-2xl z-50 flex flex-col border-r border-white/10"
           >
             {/* Header */}
             <div className="border-b border-white/10 px-6 py-6 flex items-center justify-between">
@@ -200,7 +200,7 @@ export function HistoryPanel({
             <div className="px-6 py-4 border-b border-white/10">
               <button
                 onClick={handleNewChat}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-alba-lime hover:bg-alba-lime-hover text-alba-dark font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-alba-orange hover:bg-alba-orange-hover text-alba-dark font-medium transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Plus className="w-5 h-5" />
                 Nuevo chat
@@ -217,7 +217,7 @@ export function HistoryPanel({
                     placeholder="Buscar conversaciones..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-alba-lime/50 focus:border-alba-lime/50 text-white placeholder-gray-500 transition-all"
+                    className="w-full pl-9 pr-4 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-alba-orange/50 focus:border-alba-orange/50 text-white placeholder-gray-500 transition-all"
                   />
                 </div>
               </div>
@@ -252,7 +252,7 @@ export function HistoryPanel({
                     className={cn(
                       "group relative px-4 py-4 rounded-xl transition-all duration-200 cursor-pointer mb-2",
                       currentConversationId === conversation.id
-                        ? "bg-alba-lime/10 border-l-4 border-l-alba-lime"
+                        ? "bg-alba-orange/10 border-l-4 border-l-alba-orange"
                         : "hover:bg-white/5"
                     )}
                     onClick={() => handleSelectConversation(conversation.id)}
@@ -261,7 +261,7 @@ export function HistoryPanel({
                       <MessageSquare className={cn(
                         "w-5 h-5 flex-shrink-0 mt-0.5",
                         currentConversationId === conversation.id
-                          ? "text-alba-lime"
+                          ? "text-alba-orange"
                           : "text-gray-500"
                       )} />
                       <div className="flex-1 min-w-0 pr-16">
@@ -279,14 +279,14 @@ export function HistoryPanel({
                             }}
                             onBlur={() => handleEditSave(conversation.id)}
                             onClick={(e) => e.stopPropagation()}
-                            className="w-full px-2 py-1 text-sm border border-alba-lime/50 rounded-lg bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-alba-lime/50"
+                            className="w-full px-2 py-1 text-sm border border-alba-orange/50 rounded-lg bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-alba-orange/50"
                             autoFocus
                           />
                         ) : (
                           <div className="font-medium text-white text-sm leading-tight flex items-center gap-2">
                             {conversation.title}
                             {savingId === conversation.id && (
-                              <Loader2 className="w-3 h-3 animate-spin text-alba-lime" />
+                              <Loader2 className="w-3 h-3 animate-spin text-alba-orange" />
                             )}
                           </div>
                         )}

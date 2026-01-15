@@ -47,7 +47,7 @@ export function TypingIndicator() {
       transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
     >
       {/* Leaf Avatar */}
-      <div className="w-8 h-8 rounded-full border-2 border-medical-100 dark:border-medical-800 bg-white dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
+      <div className="w-8 h-8 rounded-full border border-alba-orange/30 bg-alba-orange/10 flex items-center justify-center flex-shrink-0">
         <motion.div
           animate={{
             scale: [1, 1.1, 1],
@@ -58,19 +58,19 @@ export function TypingIndicator() {
             ease: "easeInOut",
           }}
         >
-          <Leaf className="w-4 h-4 text-medical-500 dark:text-medical-400" />
+          <Leaf className="w-4 h-4 text-alba-orange" />
         </motion.div>
       </div>
 
       {/* Message Bubble with Dynamic Text */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-sm shadow-sm px-4 py-3 min-w-[160px]">
+      <div className="bg-white/5 border border-white/10 rounded-2xl rounded-tl-sm px-4 py-3 min-w-[160px]">
         <div className="flex items-center gap-2">
           {/* Animated Dots */}
           <div className="flex items-center gap-1">
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className="w-1.5 h-1.5 bg-medical-400 dark:bg-medical-500 rounded-full"
+                className="w-1.5 h-1.5 bg-alba-orange rounded-full"
                 animate={{
                   y: [0, -6, 0],
                   opacity: [0.4, 1, 0.4],
@@ -90,7 +90,7 @@ export function TypingIndicator() {
             <AnimatePresence mode="wait">
               <motion.span
                 key={currentText}
-                className="text-[14px] text-gray-500 dark:text-gray-400 font-medium"
+                className="text-[14px] text-white/60 font-medium"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}

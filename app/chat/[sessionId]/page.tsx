@@ -366,7 +366,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] flex flex-col">
+    <div className="min-h-screen bg-[#2B3A42] flex flex-col">
       {/* Alba-style Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
@@ -409,12 +409,12 @@ export default function ChatPage() {
                     if (e.key === 'Enter') handleSaveTitle();
                     else if (e.key === 'Escape') handleCancelEditTitle();
                   }}
-                  className="flex-1 text-sm font-medium text-white bg-white/5 border border-[#D4FF00]/50 px-3 py-1.5 focus:outline-none focus:border-[#D4FF00]"
+                  className="flex-1 text-sm font-medium text-white bg-white/5 border border-[#E85A2C]/50 px-3 py-1.5 focus:outline-none focus:border-[#E85A2C]"
                   maxLength={255}
                 />
                 <button
                   onClick={handleSaveTitle}
-                  className="p-1.5 text-[#D4FF00] hover:bg-[#D4FF00]/10 transition-colors"
+                  className="p-1.5 text-[#E85A2C] hover:bg-[#E85A2C]/10 transition-colors"
                   aria-label="Guardar título"
                 >
                   <Check className="w-4 h-4" />
@@ -438,7 +438,7 @@ export default function ChatPage() {
                   {conversationTitle}
                 </h1>
                 {isSavingTitle ? (
-                  <Loader2 className="w-3 h-3 animate-spin text-[#D4FF00] flex-shrink-0" />
+                  <Loader2 className="w-3 h-3 animate-spin text-[#E85A2C] flex-shrink-0" />
                 ) : sessionId !== 'new' && (
                   <Edit2 className="w-3 h-3 text-white/40 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                 )}
@@ -449,14 +449,14 @@ export default function ChatPage() {
           {/* Right side - Actions */}
           <button
             onClick={handleNewChat}
-            className="p-2 text-[#D4FF00] hover:bg-[#D4FF00]/10 transition-colors"
+            className="p-2 text-[#E85A2C] hover:bg-[#E85A2C]/10 transition-colors"
             aria-label="Nueva conversación"
           >
             <Plus className="w-5 h-5" />
           </button>
           <button
             onClick={() => setIsFeedbackOpen(true)}
-            className="p-2 text-white/60 hover:text-[#D4FF00] hover:bg-[#D4FF00]/10 transition-colors"
+            className="p-2 text-white/60 hover:text-[#E85A2C] hover:bg-[#E85A2C]/10 transition-colors"
             aria-label="Dar feedback"
           >
             <Star className="w-5 h-5" />
@@ -520,7 +520,7 @@ export default function ChatPage() {
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.2 }}
               onClick={scrollToBottom}
-              className="absolute bottom-4 right-4 p-3 bg-white/10 border border-white/20 hover:border-[#D4FF00]/50 hover:bg-white/5 transition-all"
+              className="absolute bottom-4 right-4 p-3 bg-white/10 border border-white/20 hover:border-[#E85A2C]/50 hover:bg-white/5 transition-all"
               aria-label="Ir al final"
             >
               <ArrowDown className="w-5 h-5 text-white/60" />
@@ -541,7 +541,7 @@ export default function ChatPage() {
             className={`
               flex items-center gap-3 px-5 py-4 border transition-all duration-300
               ${isFocused
-                ? 'border-[#D4FF00] bg-white/5'
+                ? 'border-[#E85A2C] bg-white/5'
                 : 'border-white/20 hover:border-white/40'
               }
             `}
@@ -561,7 +561,7 @@ export default function ChatPage() {
             <button
               onClick={handleInputSend}
               disabled={!inputValue.trim() || isTyping}
-              className="px-5 py-2.5 bg-[#D4FF00] hover:bg-[#E5FF4D] text-black text-sm font-semibold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#E85A2C] hover:bg-[#D14E22] text-black text-sm font-semibold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
               aria-label="Enviar mensaje"
             >
               <span className="hidden sm:inline">Enviar</span>
