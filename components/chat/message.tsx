@@ -2,11 +2,14 @@
 
 import { useState, memo, useCallback } from "react"
 import { motion } from "framer-motion"
-import { Leaf, User, RefreshCw, AlertCircle, Copy, Download, Share2, Bookmark, BookmarkCheck, RotateCcw } from "lucide-react"
+import { Leaf, User, RefreshCw, AlertCircle, Copy, Download, Share2, Bookmark, BookmarkCheck, RotateCcw, Maximize2 } from "lucide-react"
 import { LazyMarkdownGfm } from "@/components/chat/lazy-markdown"
 import { useToast } from "@/components/ui/toast"
 
-interface UIMessage {
+// Threshold for showing expand button (characters)
+const LONG_CONTENT_THRESHOLD = 800
+
+export interface UIMessage {
   id: string
   role: 'user' | 'assistant'
   content: string
@@ -22,11 +25,13 @@ interface MessageProps {
   index: number
   onRetry?: (messageId: string) => void
   onRegenerate?: (messageId: string) => void
+  onExpand?: (message: UIMessage) => void
 }
 
-export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, onRegenerate }: MessageProps) {
+export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, onRegenerate, onExpand }: MessageProps) {
   const isUser = message.role === "user"
   const isError = message.isError || false
+  const isLongContent = !isUser && message.content.length > LONG_CONTENT_THRESHOLD
   const [isDownloading, setIsDownloading] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const { showToast } = useToast()
@@ -87,6 +92,12 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
       return newValue
     })
   }, [message.id, message.content, message.timestamp])
+
+  const handleExpand = useCallback(() => {
+    if (onExpand) {
+      onExpand(message)
+    }
+  }, [onExpand, message])
 
   const handleDownloadPDF = useCallback(async () => {
     setIsDownloading(true)
@@ -183,6 +194,18 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
               {/* Action Buttons - Alba style */}
               {!isError && (
                 <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-white/10">
+                  {/* Expand button - shown for long content */}
+                  {isLongContent && onExpand && (
+                    <button
+                      onClick={handleExpand}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#E85A2C] hover:bg-[#D14E22] transition-all"
+                      aria-label="Expandir en panel lateral"
+                    >
+                      <Maximize2 className="w-3.5 h-3.5" />
+                      <span>Expandir</span>
+                    </button>
+                  )}
+
                   <button
                     onClick={handleCopy}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white/60 bg-white/5 border border-white/10 hover:border-white/30 hover:text-white transition-all"

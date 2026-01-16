@@ -4,28 +4,16 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Plus, Star, ArrowDown, Edit2, Loader2, Check, X, Send, ArrowLeft } from 'lucide-react';
-import { ChatMessage } from '@/components/chat/message';
+import { ChatMessage, UIMessage } from '@/components/chat/message';
 import { MessageSkeleton } from '@/components/chat/message-skeleton';
 import { HistoryPanel } from '@/components/chat/history-panel';
 import { FeedbackModal } from '@/components/chat/feedback-modal';
+import { ContentPanel } from '@/components/chat/content-panel';
 import { FollowUpSuggestions, generateFollowUpSuggestions } from '@/components/chat/follow-up-suggestions';
 import { EmptyState } from '@/components/chat/empty-state';
 import { sendMessage, sendMessageStreaming, getErrorMessage } from '@/lib/api';
 import { saveConversation as saveToStorage, getConversation as getFromStorage, updateConversationTitle, updateConversationTitleInDB, type Conversation } from '@/lib/session';
 import { useToast } from '@/components/ui/toast';
-
-// UI Message type for chat display
-interface UIMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  isError?: boolean;
-  errorMessage?: string;
-  canRetry?: boolean;
-  originalContent?: string;
-}
-
 
 export default function ChatPage() {
   const params = useParams();
@@ -38,6 +26,8 @@ export default function ChatPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [isContentPanelOpen, setIsContentPanelOpen] = useState(false);
+  const [expandedMessage, setExpandedMessage] = useState<UIMessage | null>(null);
   const [conversationTitle, setConversationTitle] = useState('Nueva conversación');
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -351,6 +341,64 @@ export default function ChatPage() {
     router.push('/');
   };
 
+  // Handle expanding a message in the side panel
+  const handleExpandMessage = useCallback((message: UIMessage) => {
+    setExpandedMessage(message);
+    setIsContentPanelOpen(true);
+  }, []);
+
+  const handleCloseContentPanel = useCallback(() => {
+    setIsContentPanelOpen(false);
+    // Delay clearing the message for exit animation
+    setTimeout(() => setExpandedMessage(null), 300);
+  }, []);
+
+  // Check if expanded message is a meal plan
+  const isExpandedMealPlan = expandedMessage ? (
+    (expandedMessage.content.includes('Límites Diarios') || expandedMessage.content.includes('📊')) &&
+    (expandedMessage.content.includes('Desayuno') || expandedMessage.content.includes('Plan Semanal') || expandedMessage.content.includes('🌅'))
+  ) : false;
+
+  // Handle PDF download for expanded content
+  const handleExpandedPDFDownload = useCallback(async () => {
+    if (!expandedMessage) return;
+    try {
+      const response = await fetch('/api/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: expandedMessage.content }),
+      });
+      if (!response.ok) throw new Error('Failed to generate PDF');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `plan-nutricional-${Date.now()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch {
+      showToast('Error al generar el PDF', 'error');
+    }
+  }, [expandedMessage, showToast]);
+
+  // Cmd+E keyboard shortcut to expand latest long message
+  useEffect(() => {
+    const handleExpandShortcut = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
+        e.preventDefault();
+        const lastAssistantMessage = [...messages].reverse().find(m => m.role === 'assistant' && !m.isError);
+        if (lastAssistantMessage && lastAssistantMessage.content.length > 800) {
+          handleExpandMessage(lastAssistantMessage);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleExpandShortcut);
+    return () => window.removeEventListener('keydown', handleExpandShortcut);
+  }, [messages, handleExpandMessage]);
+
   const handleInputSend = () => {
     if (inputValue.trim() && !isTyping) {
       handleSendMessage(inputValue.trim());
@@ -489,6 +537,7 @@ export default function ChatPage() {
                     index={index}
                     onRetry={handleRetryMessage}
                     onRegenerate={handleRegenerateMessage}
+                    onExpand={handleExpandMessage}
                   />
                 </motion.div>
               ))}
@@ -587,6 +636,16 @@ export default function ChatPage() {
         isOpen={isFeedbackOpen}
         onClose={() => setIsFeedbackOpen(false)}
         conversationId={sessionId}
+      />
+
+      {/* Content Panel for expanded messages */}
+      <ContentPanel
+        isOpen={isContentPanelOpen}
+        onClose={handleCloseContentPanel}
+        content={expandedMessage?.content || null}
+        title="Respuesta completa"
+        isMealPlan={isExpandedMealPlan}
+        onDownloadPDF={isExpandedMealPlan ? handleExpandedPDFDownload : undefined}
       />
     </div>
   );
