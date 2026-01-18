@@ -20,6 +20,14 @@ function useIsMobile() {
 
 // Pool of all available prompts
 const allPrompts = [
+  // Alba - About the clinic
+  "¿Qué es Alba Diálisis?",
+  "¿Quiénes son los doctores de Alba?",
+  "¿Dónde están las clínicas de Alba?",
+  "¿Qué servicios ofrece Alba?",
+  "¿Cómo puedo agendar una cita?",
+  "¿Quién es la Dra. María Gutiérrez?",
+
   // General nutrition
   "¿Qué alimentos debo evitar?",
   "Ayúdame a planear mis comidas",

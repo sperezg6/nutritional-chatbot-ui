@@ -1,13 +1,19 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Utensils, FlaskConical, Apple, MessageCircle, ArrowUpRight } from "lucide-react"
+import { Utensils, FlaskConical, Apple, Building2, ArrowUpRight } from "lucide-react"
 
 interface EmptyStateProps {
   onPromptClick: (prompt: string) => void
 }
 
 const tips = [
+  {
+    icon: Building2,
+    title: "Conoce Alba",
+    description: "Información sobre nuestras clínicas y doctores",
+    prompt: "¿Qué es Alba Diálisis y dónde están sus clínicas?",
+  },
   {
     icon: Utensils,
     title: "Planes de comidas",
@@ -25,12 +31,6 @@ const tips = [
     title: "Alimentos permitidos",
     description: "Descubre qué puedes comer",
     prompt: "¿Qué frutas son seguras para mi dieta renal?",
-  },
-  {
-    icon: MessageCircle,
-    title: "Preguntas frecuentes",
-    description: "Resuelve tus dudas comunes",
-    prompt: "¿Cuánta agua debo tomar al día?",
   },
 ]
 
