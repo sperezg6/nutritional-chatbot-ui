@@ -1,26 +1,43 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import path from 'path';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 
-// Color palette
+// Logo path - use absolute path for server-side rendering
+const logoPath = path.join(process.cwd(), 'public', 'images', 'logo-verde.png');
+
+// Alba Color palette
 const colors = {
-  primary: '#0d9488',
-  primaryLight: '#ccfbf1',
-  primaryDark: '#0f766e',
-  breakfast: '#fef3c7',
-  breakfastBorder: '#f59e0b',
-  lunch: '#fee2e2',
-  lunchBorder: '#ef4444',
-  dinner: '#dbeafe',
-  dinnerBorder: '#3b82f6',
-  snack: '#dcfce7',
-  snackBorder: '#22c55e',
-  gray50: '#f9fafb',
+  // Primary - Alba Orange tones
+  primary: '#E85A2C',       // Alba Orange
+  primaryLight: '#FEF3E7',  // Light orange tint
+  primaryDark: '#C94A1F',   // Deeper Orange
+  softCoral: '#F4A261',     // Soft Coral
+
+  // Alba brand colors
+  albaDark: '#2B3A42',      // Warm Charcoal
+  albaDarkLight: '#364954',
+  sage: '#6B8E7D',          // Soft Sage
+  sageLight: '#8BA99A',
+  cream: '#FAF9F6',         // Cream
+
+  // Meal card colors - warm tones matching Alba
+  breakfast: '#FEF3E7',     // Light orange
+  breakfastBorder: '#F4A261',
+  lunch: '#E8F0ED',         // Light sage
+  lunchBorder: '#6B8E7D',
+  dinner: '#FFF7ED',        // Warm cream
+  dinnerBorder: '#E85A2C',
+  snack: '#F0FDF4',         // Light green
+  snackBorder: '#6B8E7D',
+
+  // Neutrals
+  gray50: '#FAF9F6',        // Alba cream
   gray100: '#f3f4f6',
   gray200: '#e5e7eb',
   gray500: '#6b7280',
   gray600: '#4b5563',
   gray700: '#374151',
-  gray800: '#1f2937',
+  gray800: '#2B3A42',       // Alba dark
   white: '#ffffff',
   danger: '#ef4444',
 };
@@ -42,19 +59,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  logoBox: {
-    width: 28,
-    height: 28,
-    backgroundColor: colors.white,
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  logoText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: colors.primary,
+  logoImage: {
+    width: 40,
+    height: 40,
+    marginRight: 10,
   },
   brandName: {
     fontSize: 9,
@@ -562,10 +570,8 @@ export function MealPlanPDF({ content }: MealPlanPDFProps) {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerBrand}>
-            <View style={styles.logoBox}>
-              <Text style={styles.logoText}>N+</Text>
-            </View>
-            <Text style={styles.brandName}>NUTRIRENAL</Text>
+            <Image src={logoPath} style={styles.logoImage} />
+            <Text style={styles.brandName}>ALBA CLÍNICA</Text>
           </View>
           <Text style={styles.headerTitle}>{plan.title}</Text>
           <Text style={styles.headerDate}>
@@ -643,7 +649,7 @@ export function MealPlanPDF({ content }: MealPlanPDFProps) {
               No sustituye el consejo médico profesional.
             </Text>
           </View>
-          <Text style={styles.footerBrand}>NutriRenal</Text>
+          <Text style={styles.footerBrand}>Alba Clínica</Text>
         </View>
       </Page>
     </Document>

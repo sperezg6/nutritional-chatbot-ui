@@ -36,10 +36,25 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
   const [isBookmarked, setIsBookmarked] = useState(false)
   const { showToast } = useToast()
 
-  // Detect if message is a meal plan
+  // Detect if message is a meal plan - more flexible detection
   const isMealPlan = !isUser && (
-    (message.content.includes('Límites Diarios') || message.content.includes('📊')) &&
-    (message.content.includes('Desayuno') || message.content.includes('Plan Semanal') || message.content.includes('🌅'))
+    // Has meal-related content
+    (message.content.includes('Desayuno') ||
+     message.content.includes('Comida') ||
+     message.content.includes('Cena') ||
+     message.content.includes('Colación') ||
+     message.content.includes('🌅') ||
+     message.content.includes('🍳') ||
+     message.content.includes('🥗')) &&
+    // And has nutritional/plan structure
+    (message.content.includes('Límites') ||
+     message.content.includes('Plan') ||
+     message.content.includes('Día') ||
+     message.content.includes('📊') ||
+     message.content.includes('Sodio') ||
+     message.content.includes('Proteína') ||
+     message.content.includes('Calorías') ||
+     message.content.includes('kcal'))
   )
 
   const handleCopy = useCallback(async () => {
