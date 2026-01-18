@@ -12,7 +12,7 @@ import { ContentPanel } from '@/components/chat/content-panel';
 import { FollowUpSuggestions, generateFollowUpSuggestions } from '@/components/chat/follow-up-suggestions';
 import { EmptyState } from '@/components/chat/empty-state';
 import { sendMessage, sendMessageStreaming, getErrorMessage } from '@/lib/api';
-import { saveConversation as saveToStorage, getConversation as getFromStorage, updateConversationTitle, updateConversationTitleInDB, type Conversation } from '@/lib/session';
+import { saveConversation as saveToStorage, getConversation as getFromStorage, getAllConversations, deleteConversation, updateConversationTitle, updateConversationTitleInDB, type Conversation } from '@/lib/session';
 import { useToast } from '@/components/ui/toast';
 
 export default function ChatPage() {
@@ -35,6 +35,10 @@ export default function ChatPage() {
   const [isSavingTitle, setIsSavingTitle] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [lastSendTime, setLastSendTime] = useState(0);
+  const retryCountRef = useRef<Map<string, number>>(new Map());
+  const MAX_RETRIES = 3;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const hasProcessedFirstMessage = useRef(false);
@@ -53,6 +57,20 @@ export default function ChatPage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
+
+  // Load all conversations for history panel
+  useEffect(() => {
+    const loadConversations = () => {
+      const allConvs = getAllConversations();
+      setConversations(allConvs);
+    };
+    loadConversations();
+
+    // Refresh when history panel opens
+    if (isHistoryOpen) {
+      loadConversations();
+    }
+  }, [isHistoryOpen]);
 
   // Handle first message from query param
   useEffect(() => {
@@ -145,6 +163,14 @@ export default function ChatPage() {
   }, [messages, sessionId, conversationTitle]);
 
   const handleSendMessage = async (content: string) => {
+    // Rate limiting: minimum 1 second between messages
+    const now = Date.now();
+    if (now - lastSendTime < 1000) {
+      showToast('Por favor espera un momento antes de enviar otro mensaje', 'error');
+      return;
+    }
+    setLastSendTime(now);
+
     const userMessage: UIMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -298,6 +324,22 @@ export default function ChatPage() {
     const failedMessage = messages[messageIndex] as UIMessage;
     if (!failedMessage.originalContent) return;
 
+    // Check retry count
+    const currentRetries = retryCountRef.current.get(failedMessage.originalContent) || 0;
+    if (currentRetries >= MAX_RETRIES) {
+      showToast(`Se alcanzó el límite de ${MAX_RETRIES} reintentos. Por favor intenta más tarde.`, 'error');
+      // Disable retry on this message
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === messageId ? { ...m, canRetry: false, errorMessage: 'Límite de reintentos alcanzado' } : m
+        )
+      );
+      return;
+    }
+
+    // Increment retry count
+    retryCountRef.current.set(failedMessage.originalContent, currentRetries + 1);
+
     setMessages((prev) => prev.filter((m) => m.id !== messageId));
     await handleSendMessage(failedMessage.originalContent);
   };
@@ -339,6 +381,23 @@ export default function ChatPage() {
 
   const handleNewChat = () => {
     router.push('/');
+  };
+
+  const handleSelectConversation = (conversationId: string) => {
+    setIsHistoryOpen(false);
+    if (conversationId !== sessionId) {
+      router.push(`/chat/${conversationId}`);
+    }
+  };
+
+  const handleDeleteConversation = (conversationId: string) => {
+    deleteConversation(conversationId);
+    setConversations(prev => prev.filter(c => c.id !== conversationId));
+
+    // If deleting current conversation, go to home
+    if (conversationId === sessionId) {
+      router.push('/');
+    }
   };
 
   // Handle expanding a message in the side panel
@@ -604,8 +663,14 @@ export default function ChatPage() {
               onBlur={() => setIsFocused(false)}
               placeholder="Escribe tu mensaje..."
               disabled={isTyping}
+              aria-label="Mensaje para el asistente de nutrición"
+              aria-describedby="input-hint"
+              role="textbox"
               className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-white/30 text-base disabled:opacity-50"
             />
+            <span id="input-hint" className="sr-only">
+              {isTyping ? 'Procesando mensaje, por favor espera' : 'Escribe tu pregunta y presiona Enter o el botón Enviar'}
+            </span>
 
             <button
               onClick={handleInputSend}
@@ -624,10 +689,10 @@ export default function ChatPage() {
       <HistoryPanel
         isOpen={isHistoryOpen}
         onClose={() => setIsHistoryOpen(false)}
-        conversations={[]}
+        conversations={conversations}
         currentConversationId={sessionId}
-        onSelectConversation={() => {}}
-        onDeleteConversation={() => {}}
+        onSelectConversation={handleSelectConversation}
+        onDeleteConversation={handleDeleteConversation}
         onNewChat={handleNewChat}
       />
 

@@ -2,7 +2,7 @@
 
 import { useState, memo, useCallback } from "react"
 import { motion } from "framer-motion"
-import { Leaf, User, RefreshCw, AlertCircle, Copy, Download, Share2, Bookmark, BookmarkCheck, RotateCcw, Maximize2 } from "lucide-react"
+import { Leaf, User, RefreshCw, AlertCircle, Copy, Download, Share2, Bookmark, BookmarkCheck, RotateCcw, Maximize2, Loader2 } from "lucide-react"
 import { LazyMarkdownGfm } from "@/components/chat/lazy-markdown"
 import { useToast } from "@/components/ui/toast"
 
@@ -272,10 +272,15 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                     <button
                       onClick={handleDownloadPDF}
                       disabled={isDownloading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#E85A2C] hover:bg-[#D14E22] disabled:opacity-50 transition-all uppercase tracking-wider"
-                      aria-label="Descargar PDF"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#E85A2C] hover:bg-[#D14E22] disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-wider"
+                      aria-label={isDownloading ? "Generando PDF..." : "Descargar PDF"}
+                      aria-busy={isDownloading}
                     >
-                      <Download className="w-3.5 h-3.5" />
+                      {isDownloading ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Download className="w-3.5 h-3.5" />
+                      )}
                       <span>{isDownloading ? 'Generando...' : 'PDF'}</span>
                     </button>
                   )}
