@@ -20,8 +20,8 @@ export function FollowUpSuggestions({ suggestions, onSelect, isVisible = true }:
       className="mt-4 ml-0 md:ml-11"
     >
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-1.5 h-1.5 rounded-full bg-white/30" />
-        <span className="text-[10px] font-medium text-white/30 uppercase tracking-wider">
+        <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">
           Sugerencias
         </span>
       </div>
@@ -33,12 +33,12 @@ export function FollowUpSuggestions({ suggestions, onSelect, isVisible = true }:
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2, delay: 0.05 * index }}
             onClick={() => onSelect(suggestion)}
-            className="group inline-flex items-center gap-2 px-3 py-2 text-sm text-white/50 border border-white/10
-                       hover:text-white hover:border-[#E85A2C]/50 hover:bg-white/5
+            className="group inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-500 border border-gray-200
+                       hover:text-gray-900 hover:border-[#4DBDC9]/50 hover:bg-gray-50
                        transition-all duration-200 cursor-pointer"
           >
             <span>{suggestion}</span>
-            <ArrowUpRight className="w-3.5 h-3.5 text-white/30 group-hover:text-[#E85A2C] transition-all" />
+            <ArrowUpRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#4DBDC9] transition-all" />
           </motion.button>
         ))}
       </div>

@@ -159,12 +159,12 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
         <div className={`w-8 h-8 flex items-center justify-center flex-shrink-0 ${
           isError
             ? 'border border-red-500/30 bg-red-500/10'
-            : 'border border-[#E85A2C]/30 bg-[#E85A2C]/10'
+            : 'border border-[#4DBDC9]/30 bg-[#4DBDC9]/10'
         }`}>
           {isError ? (
             <AlertCircle className="w-4 h-4 text-red-400" />
           ) : (
-            <Leaf className="w-4 h-4 text-[#E85A2C]" />
+            <Leaf className="w-4 h-4 text-[#4DBDC9]" />
           )}
         </div>
       )}
@@ -174,10 +174,10 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
         <div
           className={`
             ${isUser
-              ? 'bg-[#E85A2C] text-black'
+              ? 'bg-[#4DBDC9] text-black'
               : isError
               ? 'bg-red-500/10 border border-red-500/30'
-              : 'bg-white/5 border border-white/10'
+              : 'bg-white border border-gray-200'
             }
             px-5 py-4
           `}
@@ -191,29 +191,29 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
               <LazyMarkdownGfm
                 content={message.content}
                 className={`
-                  prose prose-sm max-w-none prose-invert
-                  ${isError ? 'text-red-300' : 'text-white/80'}
-                  prose-headings:font-light prose-headings:text-white
-                  prose-h2:text-lg prose-h2:mt-6 prose-h2:mb-3 prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-2
+                  prose prose-sm max-w-none
+                  ${isError ? 'text-red-300' : 'text-gray-700'}
+                  prose-headings:font-light prose-headings:text-gray-900
+                  prose-h2:text-lg prose-h2:mt-6 prose-h2:mb-3 prose-h2:border-b prose-h2:border-gray-200 prose-h2:pb-2
                   prose-h3:text-base prose-h3:mt-4 prose-h3:mb-2
                   prose-p:my-2 prose-p:leading-relaxed
                   prose-ul:my-3 prose-ul:space-y-1 prose-ul:list-none
                   prose-ol:my-3 prose-ol:space-y-1 prose-ol:list-none
                   prose-li:my-0.5 prose-li:leading-relaxed prose-li:pl-0
-                  prose-hr:my-6 prose-hr:border-white/10
-                  prose-strong:text-white prose-strong:font-medium
-                  prose-a:text-[#E85A2C] prose-a:no-underline hover:prose-a:underline
+                  prose-hr:my-6 prose-hr:border-gray-200
+                  prose-strong:text-gray-900 prose-strong:font-medium
+                  prose-a:text-[#4DBDC9] prose-a:no-underline hover:prose-a:underline
                 `}
               />
 
               {/* Action Buttons - Alba style */}
               {!isError && (
-                <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-white/10">
+                <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-gray-200">
                   {/* Expand button - shown for long content */}
                   {isLongContent && onExpand && (
                     <button
                       onClick={handleExpand}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#E85A2C] hover:bg-[#D14E22] transition-all"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#4DBDC9] hover:bg-[#3A9BA6] transition-all"
                       aria-label="Expandir en panel lateral"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
@@ -223,7 +223,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
 
                   <button
                     onClick={handleCopy}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white/60 bg-white/5 border border-white/10 hover:border-white/30 hover:text-white transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 hover:border-gray-300 hover:text-gray-900 transition-all"
                     aria-label="Copiar mensaje"
                   >
                     <Copy className="w-3.5 h-3.5" />
@@ -232,7 +232,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
 
                   <button
                     onClick={handleShare}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white/60 bg-white/5 border border-white/10 hover:border-white/30 hover:text-white transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 hover:border-gray-300 hover:text-gray-900 transition-all"
                     aria-label="Compartir mensaje"
                   >
                     <Share2 className="w-3.5 h-3.5" />
@@ -242,7 +242,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                   {onRegenerate && (
                     <button
                       onClick={handleRegenerate}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white/60 bg-white/5 border border-white/10 hover:border-white/30 hover:text-white transition-all"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 hover:border-gray-300 hover:text-gray-900 transition-all"
                       aria-label="Regenerar respuesta"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
@@ -254,8 +254,8 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                     onClick={handleBookmark}
                     className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all ${
                       isBookmarked
-                        ? 'text-[#E85A2C] bg-[#E85A2C]/10 border border-[#E85A2C]/30'
-                        : 'text-white/60 bg-white/5 border border-white/10 hover:border-white/30 hover:text-white'
+                        ? 'text-[#4DBDC9] bg-[#4DBDC9]/10 border border-[#4DBDC9]/30'
+                        : 'text-gray-500 bg-gray-50 border border-gray-200 hover:border-gray-300 hover:text-gray-900'
                     }`}
                     aria-label={isBookmarked ? "Quitar de guardados" : "Guardar mensaje"}
                   >
@@ -272,7 +272,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                     <button
                       onClick={handleDownloadPDF}
                       disabled={isDownloading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#E85A2C] hover:bg-[#D14E22] disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-wider"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#4DBDC9] hover:bg-[#3A9BA6] disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-wider"
                       aria-label={isDownloading ? "Generando PDF..." : "Descargar PDF"}
                       aria-busy={isDownloading}
                     >
@@ -308,7 +308,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
           )}
         </div>
 
-        <span className={`text-[11px] ${isError ? 'text-red-400/60' : 'text-white/30'} mt-1.5 ${isUser ? 'text-right' : 'text-left'} px-1`}>
+        <span className={`text-[11px] ${isError ? 'text-red-400/60' : 'text-gray-400'} mt-1.5 ${isUser ? 'text-right' : 'text-left'} px-1`}>
           {message.timestamp.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -318,7 +318,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
 
       {/* User Avatar - Alba style */}
       {isUser && (
-        <div className="w-8 h-8 border border-[#E85A2C]/30 bg-[#E85A2C] flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 border border-[#4DBDC9]/30 bg-[#4DBDC9] flex items-center justify-center flex-shrink-0">
           <User className="w-4 h-4 text-black" />
         </div>
       )}

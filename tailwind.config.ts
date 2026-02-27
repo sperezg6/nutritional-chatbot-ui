@@ -21,14 +21,14 @@ const config: Config = {
           foreground: "hsl(var(--popover-foreground))",
         },
         primary: {
-          50: '#FEF3E7',
-          100: '#FDDCCC',
-          200: '#FABD99',
-          300: '#F49B66',
-          400: '#F4A261',       // Soft Coral
-          500: '#E85A2C',       // Alba Orange
-          600: '#C94A1F',       // Deeper Orange
-          700: '#A63D18',
+          50: '#E0F4F7',
+          100: '#B3E5EC',
+          200: '#80D4E0',
+          300: '#4DC3D4',
+          400: '#4DBDC9',       // Alba Aqua
+          500: '#3A9BA6',       // Deeper Aqua
+          600: '#2E7D85',
+          700: '#225F65',
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
@@ -36,12 +36,12 @@ const config: Config = {
         alba: {
           dark: '#2B3A42',              // Warm Charcoal
           'dark-light': '#364954',
-          orange: '#E85A2C',
-          'orange-light': '#F4A261',
-          'orange-dark': '#C94A1F',
-          sage: '#6B8E7D',              // Soft Sage
-          'sage-light': '#8BA99A',
-          cream: '#FAF9F6',
+          primary: '#4DBDC9',
+          'primary-light': '#7DD3DE',
+          'primary-dark': '#3A9BA6',
+          secondary: '#EE5631',
+          'secondary-light': '#F47A5E',
+          cream: '#FAFAF7',
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -52,12 +52,12 @@ const config: Config = {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          50: '#E8F0ED',
-          100: '#C5DDD4',
-          200: '#A1CABB',
-          300: '#8BA99A',       // Sage tones
-          400: '#6B8E7D',
-          500: '#567264',
+          50: '#FEF0EC',
+          100: '#FDDDD6',
+          200: '#F9B8A8',
+          300: '#F47A5E',       // Orange tones
+          400: '#EE5631',
+          500: '#C94525',
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
@@ -92,6 +92,7 @@ const config: Config = {
       fontFamily: {
         serif: ['var(--font-serif)', 'Georgia', 'serif'],
         sans: ['var(--font-sans)', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        heading: ['var(--font-heading)', 'Georgia', 'serif'],
       },
       borderRadius: {
         lg: "var(--radius)",

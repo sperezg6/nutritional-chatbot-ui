@@ -473,19 +473,19 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#2B3A42] flex flex-col">
+    <div className="min-h-screen bg-[#FAFAF7] flex flex-col">
       {/* Alba-style Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="border-b border-white/10 px-4 md:px-6 lg:px-10 py-4"
+        className="border-b border-gray-200 px-4 md:px-6 lg:px-10 py-4"
       >
         <div className="max-w-6xl mx-auto flex items-center gap-3">
           {/* Back/Home */}
           <button
             onClick={handleNewChat}
-            className="p-2 text-white/60 hover:text-white hover:bg-white/5 transition-all"
+            className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all"
             aria-label="Volver al inicio"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -494,14 +494,14 @@ export default function ChatPage() {
           {/* History button */}
           <button
             onClick={() => setIsHistoryOpen(true)}
-            className="p-2 text-white/60 hover:text-white hover:bg-white/5 transition-all"
+            className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all"
             aria-label="Ver historial"
           >
             <MessageSquare className="w-5 h-5" />
           </button>
 
           {/* Divider */}
-          <div className="w-px h-5 bg-white/10" />
+          <div className="w-px h-5 bg-gray-200" />
 
           {/* Title - Editable */}
           <div className="flex-1 min-w-0 flex items-center gap-2">
@@ -516,19 +516,19 @@ export default function ChatPage() {
                     if (e.key === 'Enter') handleSaveTitle();
                     else if (e.key === 'Escape') handleCancelEditTitle();
                   }}
-                  className="flex-1 text-sm font-medium text-white bg-white/5 border border-[#E85A2C]/50 px-3 py-1.5 focus:outline-none focus:border-[#E85A2C]"
+                  className="flex-1 text-sm font-medium text-gray-900 bg-gray-100 border border-[#4DBDC9]/50 px-3 py-1.5 focus:outline-none focus:border-[#4DBDC9]"
                   maxLength={255}
                 />
                 <button
                   onClick={handleSaveTitle}
-                  className="p-1.5 text-[#E85A2C] hover:bg-[#E85A2C]/10 transition-colors"
+                  className="p-1.5 text-[#4DBDC9] hover:bg-[#4DBDC9]/10 transition-colors"
                   aria-label="Guardar título"
                 >
                   <Check className="w-4 h-4" />
                 </button>
                 <button
                   onClick={handleCancelEditTitle}
-                  className="p-1.5 text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                  className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
                   aria-label="Cancelar"
                 >
                   <X className="w-4 h-4" />
@@ -537,17 +537,17 @@ export default function ChatPage() {
             ) : (
               <button
                 onClick={handleStartEditTitle}
-                className="group flex items-center gap-2 min-w-0 hover:bg-white/5 px-2 py-1 transition-colors"
+                className="group flex items-center gap-2 min-w-0 hover:bg-gray-100 px-2 py-1 transition-colors"
                 disabled={sessionId === 'new'}
                 title={sessionId === 'new' ? 'Envía un mensaje para crear la conversación' : 'Haz clic para editar el título'}
               >
-                <h1 className="text-sm font-light text-white/80 truncate">
+                <h1 className="text-sm font-light text-gray-700 truncate">
                   {conversationTitle}
                 </h1>
                 {isSavingTitle ? (
-                  <Loader2 className="w-3 h-3 animate-spin text-[#E85A2C] flex-shrink-0" />
+                  <Loader2 className="w-3 h-3 animate-spin text-[#4DBDC9] flex-shrink-0" />
                 ) : sessionId !== 'new' && (
-                  <Edit2 className="w-3 h-3 text-white/40 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                  <Edit2 className="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                 )}
               </button>
             )}
@@ -556,14 +556,14 @@ export default function ChatPage() {
           {/* Right side - Actions */}
           <button
             onClick={handleNewChat}
-            className="p-2 text-[#E85A2C] hover:bg-[#E85A2C]/10 transition-colors"
+            className="p-2 text-[#4DBDC9] hover:bg-[#4DBDC9]/10 transition-colors"
             aria-label="Nueva conversación"
           >
             <Plus className="w-5 h-5" />
           </button>
           <button
             onClick={() => setIsFeedbackOpen(true)}
-            className="p-2 text-white/60 hover:text-[#E85A2C] hover:bg-[#E85A2C]/10 transition-colors"
+            className="p-2 text-gray-500 hover:text-[#4DBDC9] hover:bg-[#4DBDC9]/10 transition-colors"
             aria-label="Dar feedback"
           >
             <Star className="w-5 h-5" />
@@ -579,7 +579,17 @@ export default function ChatPage() {
         transition={{ duration: 0.3, delay: 0.1 }}
         className="flex-1 overflow-y-auto px-4 md:px-6 py-6 relative"
       >
-        <div className="max-w-4xl mx-auto space-y-6">
+        {/* Decorative gradient blobs */}
+        <div
+          className="absolute -top-32 -right-32 w-[500px] h-[500px] opacity-20 pointer-events-none"
+          style={{ backgroundImage: 'url(/gradient-blob.png)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }}
+        />
+        <div
+          className="absolute -bottom-32 -left-32 w-[400px] h-[400px] opacity-15 pointer-events-none rotate-180"
+          style={{ backgroundImage: 'url(/gradient-blob.png)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }}
+        />
+
+        <div className="max-w-4xl mx-auto space-y-6 relative z-10">
           {messages.length === 0 ? (
             <EmptyState onPromptClick={handleSendMessage} />
           ) : (
@@ -628,10 +638,10 @@ export default function ChatPage() {
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.2 }}
               onClick={scrollToBottom}
-              className="absolute bottom-4 right-4 p-3 bg-white/10 border border-white/20 hover:border-[#E85A2C]/50 hover:bg-white/5 transition-all"
+              className="absolute bottom-4 right-4 p-3 bg-gray-100 border border-gray-200 hover:border-[#4DBDC9]/50 hover:bg-gray-50 transition-all"
               aria-label="Ir al final"
             >
-              <ArrowDown className="w-5 h-5 text-white/60" />
+              <ArrowDown className="w-5 h-5 text-gray-500" />
             </motion.button>
           )}
         </AnimatePresence>
@@ -642,15 +652,15 @@ export default function ChatPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
-        className="border-t border-white/10 px-4 md:px-6 lg:px-10 py-4"
+        className="border-t border-gray-200 px-4 md:px-6 lg:px-10 py-4"
       >
         <div className="max-w-4xl mx-auto">
           <div
             className={`
               flex items-center gap-3 px-5 py-4 border transition-all duration-300
               ${isFocused
-                ? 'border-[#E85A2C] bg-white/5'
-                : 'border-white/20 hover:border-white/40'
+                ? 'border-[#4DBDC9] bg-white'
+                : 'border-gray-200 hover:border-gray-400'
               }
             `}
           >
@@ -666,7 +676,7 @@ export default function ChatPage() {
               aria-label="Mensaje para el asistente de nutrición"
               aria-describedby="input-hint"
               role="textbox"
-              className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-white/30 text-base disabled:opacity-50"
+              className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder:text-gray-400 text-base disabled:opacity-50"
             />
             <span id="input-hint" className="sr-only">
               {isTyping ? 'Procesando mensaje, por favor espera' : 'Escribe tu pregunta y presiona Enter o el botón Enviar'}
@@ -675,7 +685,7 @@ export default function ChatPage() {
             <button
               onClick={handleInputSend}
               disabled={!inputValue.trim() || isTyping}
-              className="px-5 py-2.5 bg-[#E85A2C] hover:bg-[#D14E22] text-black text-sm font-semibold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#4DBDC9] hover:bg-[#3A9BA6] text-black text-sm font-semibold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
               aria-label="Enviar mensaje"
             >
               <span className="hidden sm:inline">Enviar</span>

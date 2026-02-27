@@ -43,7 +43,7 @@ export default function Home() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#2B3A42]">
+    <div className="relative min-h-screen bg-[#FAFAF7]">
       {/* Alba-style Minimal Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
@@ -55,7 +55,7 @@ export default function Home() {
           {/* Left - History button */}
           <button
             onClick={() => setIsHistoryOpen(true)}
-            className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors"
             aria-label="Ver historial"
           >
             <MessageSquare className="w-5 h-5" />
@@ -67,7 +67,7 @@ export default function Home() {
             href="https://albadialisis.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-base font-semibold uppercase tracking-[0.1em] text-white hover:text-white/80 transition-colors"
+            className="text-base font-semibold uppercase tracking-[0.1em] text-gray-900 hover:text-gray-600 transition-colors"
           >
             ALBA
           </a>
@@ -75,7 +75,7 @@ export default function Home() {
           {/* Right - Feedback */}
           <button
             onClick={() => setIsFeedbackOpen(true)}
-            className="flex items-center gap-2 text-white/60 hover:text-[#E85A2C] transition-colors"
+            className="flex items-center gap-2 text-gray-500 hover:text-[#4DBDC9] transition-colors"
             aria-label="Dar feedback"
           >
             <Star className="w-5 h-5" />
@@ -94,7 +94,7 @@ export default function Home() {
         >
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-2 h-2 rounded-full bg-[#E85A2C]" />
+              <div className="w-2 h-2 rounded-full bg-[#4DBDC9]" />
               <span className="text-xs font-medium text-white/50 uppercase tracking-wider">
                 Aviso Importante
               </span>
@@ -112,7 +112,7 @@ export default function Home() {
           <DialogFooter className="mt-6">
             <Button
               onClick={handleDisclaimerClose}
-              className="w-full bg-[#E85A2C] hover:bg-[#D14E22] text-black font-semibold uppercase tracking-wider"
+              className="w-full bg-[#4DBDC9] hover:bg-[#3A9BA6] text-black font-semibold uppercase tracking-wider"
             >
               Entendido
             </Button>

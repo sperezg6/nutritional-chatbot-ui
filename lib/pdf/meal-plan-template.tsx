@@ -7,31 +7,31 @@ const logoPath = path.join(process.cwd(), 'public', 'images', 'logo-verde.png');
 
 // Alba Color palette
 const colors = {
-  // Primary - Alba Orange tones
-  primary: '#E85A2C',       // Alba Orange
-  primaryLight: '#FEF3E7',  // Light orange tint
-  primaryDark: '#C94A1F',   // Deeper Orange
-  softCoral: '#F4A261',     // Soft Coral
+  // Primary - Alba Aqua tones
+  primary: '#4DBDC9',       // Alba Aqua
+  primaryLight: '#E0F4F7',  // Light aqua tint
+  primaryDark: '#3A9BA6',   // Deeper Aqua
+  softCoral: '#7DD3DE',     // Light Aqua
 
   // Alba brand colors
   albaDark: '#2B3A42',      // Warm Charcoal
   albaDarkLight: '#364954',
-  sage: '#6B8E7D',          // Soft Sage
-  sageLight: '#8BA99A',
-  cream: '#FAF9F6',         // Cream
+  sage: '#EE5631',          // Alba Orange (secondary)
+  sageLight: '#F47A5E',
+  cream: '#FAFAF7',         // Cream
 
-  // Meal card colors - warm tones matching Alba
-  breakfast: '#FEF3E7',     // Light orange
-  breakfastBorder: '#F4A261',
-  lunch: '#E8F0ED',         // Light sage
-  lunchBorder: '#6B8E7D',
-  dinner: '#FFF7ED',        // Warm cream
-  dinnerBorder: '#E85A2C',
-  snack: '#F0FDF4',         // Light green
-  snackBorder: '#6B8E7D',
+  // Meal card colors - aqua/warm tones matching Alba
+  breakfast: '#E0F4F7',     // Light aqua
+  breakfastBorder: '#7DD3DE',
+  lunch: '#FEF0EC',         // Light orange
+  lunchBorder: '#EE5631',
+  dinner: '#E0F4F7',        // Light aqua
+  dinnerBorder: '#4DBDC9',
+  snack: '#FEF0EC',         // Light orange
+  snackBorder: '#EE5631',
 
   // Neutrals
-  gray50: '#FAF9F6',        // Alba cream
+  gray50: '#FAFAF7',        // Alba cream
   gray100: '#f3f4f6',
   gray200: '#e5e7eb',
   gray500: '#6b7280',

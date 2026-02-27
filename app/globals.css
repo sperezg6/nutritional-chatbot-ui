@@ -4,7 +4,8 @@
 
 @layer base {
   :root {
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-sans: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-heading: 'Cardo', Georgia, serif;
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -31,30 +32,30 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    /* Alba Brand Colors - Warm & Welcoming Palette */
-    --color-primary: #E85A2C;           /* Alba Orange */
-    --color-primary-light: #F4A261;     /* Soft Coral */
-    --color-primary-dark: #C94A1F;      /* Deeper Orange */
-    --color-secondary: #6B8E7D;         /* Soft Sage */
-    --color-secondary-light: #8BA99A;
-    --color-secondary-dark: #567264;
-    --color-background: #FAF9F6;        /* Warm Cream */
+    /* Alba Brand Colors - Aqua & Warm Palette */
+    --color-primary: #4DBDC9;           /* Alba Aqua */
+    --color-primary-light: #7DD3DE;     /* Light Aqua */
+    --color-primary-dark: #3A9BA6;      /* Deeper Aqua */
+    --color-secondary: #EE5631;         /* Alba Orange */
+    --color-secondary-light: #F47A5E;
+    --color-secondary-dark: #C94525;
+    --color-background: #FAFAF7;        /* Warm Cream */
     --color-surface: #FFFFFF;
     --color-text: #374151;              /* Warm Dark Gray */
     --color-muted: #6B7280;
     --color-border: #E5E7EB;
 
-    /* Medical green palette from landing page */
-    --medical-50: #E8F5F2;
-    --medical-100: #C5E8E1;
-    --medical-200: #9DD9CC;
-    --medical-300: #75CAB7;
-    --medical-400: #5BB3A0;
-    --medical-500: #469C88;
-    --medical-600: #3A8070;
-    --medical-700: #2E6459;
-    --medical-800: #234A43;
-    --medical-900: #18302C;
+    /* Medical aqua palette */
+    --medical-50: #E0F4F7;
+    --medical-100: #B3E5EC;
+    --medical-200: #80D4E0;
+    --medical-300: #4DC3D4;
+    --medical-400: #4DBDC9;
+    --medical-500: #3A9BA6;
+    --medical-600: #2E7D85;
+    --medical-700: #225F65;
+    --medical-800: #174246;
+    --medical-900: #0C2528;
   }
 
   .dark {
@@ -79,29 +80,29 @@
     --ring: 212.7 26.8% 83.9%;
 
     /* Alba Brand Colors - Dark mode */
-    --color-primary: #E85A2C;           /* Keep orange in dark mode */
-    --color-primary-light: #F4A261;
-    --color-primary-dark: #C94A1F;
-    --color-secondary: #8BA99A;         /* Lighter sage for dark mode */
-    --color-secondary-light: #9DBCAD;
-    --color-secondary-dark: #6B8E7D;
+    --color-primary: #4DBDC9;           /* Aqua in dark mode */
+    --color-primary-light: #7DD3DE;
+    --color-primary-dark: #3A9BA6;
+    --color-secondary: #F47A5E;         /* Lighter orange for dark mode */
+    --color-secondary-light: #F9A08C;
+    --color-secondary-dark: #EE5631;
     --color-background: #2B3A42;        /* Warm Charcoal */
     --color-surface: #364954;
     --color-text: #F9FAFB;
     --color-muted: #9CA3AF;
     --color-border: rgba(255, 255, 255, 0.12);
 
-    /* Dark mode medical green - adjusted for dark backgrounds */
-    --medical-50: #18302C;
-    --medical-100: #234A43;
-    --medical-200: #2E6459;
-    --medical-300: #3A8070;
-    --medical-400: #469C88;
-    --medical-500: #5BB3A0;
-    --medical-600: #75CAB7;
-    --medical-700: #9DD9CC;
-    --medical-800: #C5E8E1;
-    --medical-900: #E8F5F2;
+    /* Dark mode medical aqua - adjusted for dark backgrounds */
+    --medical-50: #0C2528;
+    --medical-100: #174246;
+    --medical-200: #225F65;
+    --medical-300: #2E7D85;
+    --medical-400: #3A9BA6;
+    --medical-500: #4DBDC9;
+    --medical-600: #7DD3DE;
+    --medical-700: #80D4E0;
+    --medical-800: #B3E5EC;
+    --medical-900: #E0F4F7;
   }
 
   * {
@@ -109,7 +110,7 @@
   }
 
   body {
-    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans;
+    @apply bg-[#FAFAF7] text-gray-900 font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
