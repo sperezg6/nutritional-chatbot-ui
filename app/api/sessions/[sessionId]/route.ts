@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 
 // Helper to validate UUID format
 function isValidUUID(str: string): boolean {
@@ -16,6 +17,16 @@ export async function PATCH(
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
+    // Rate limiting: 20 session updates per minute per IP
+    const clientId = getClientIdentifier(request);
+    const { allowed } = checkRateLimit(`sessions:${clientId}`, 20, 60 * 1000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const { sessionId } = await params;
 
     // Validate session ID format
@@ -63,7 +74,7 @@ export async function PATCH(
     if (error) {
       console.error('Supabase error updating session title:', error);
 
-      // Check if session doesn't exist
+      // Sanitize error responses — don't expose Supabase internals
       if (error.code === 'PGRST116') {
         return NextResponse.json(
           { error: 'Session not found' },

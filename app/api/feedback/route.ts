@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 
 // Helper to validate UUID format
 function isValidUUID(str: string): boolean {
@@ -9,6 +10,16 @@ function isValidUUID(str: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 10 feedback submissions per minute per IP
+    const clientId = getClientIdentifier(request);
+    const { allowed } = checkRateLimit(`feedback:${clientId}`, 10, 60 * 1000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { session_id, rating, comment } = body;
 
@@ -24,6 +35,14 @@ export async function POST(request: NextRequest) {
     if (rating < 1 || rating > 5) {
       return NextResponse.json(
         { error: 'rating must be between 1 and 5' },
+        { status: 400 }
+      );
+    }
+
+    // Validate comment length
+    if (comment && (typeof comment !== 'string' || comment.length > 500)) {
+      return NextResponse.json(
+        { error: 'Comment must be a string of 500 characters or less' },
         { status: 400 }
       );
     }

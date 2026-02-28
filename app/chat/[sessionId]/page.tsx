@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Plus, Star, ArrowDown, Edit2, Loader2, Check, X, Send, ArrowLeft } from 'lucide-react';
+import { MessageSquare, Plus, Star, ArrowDown, Edit2, Loader2, Check, X, Send, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { ChatMessage, UIMessage } from '@/components/chat/message';
 import { MessageSkeleton } from '@/components/chat/message-skeleton';
 import { HistoryPanel } from '@/components/chat/history-panel';
@@ -39,6 +39,7 @@ export default function ChatPage() {
   const [lastSendTime, setLastSendTime] = useState(0);
   const retryCountRef = useRef<Map<string, number>>(new Map());
   const MAX_RETRIES = 3;
+  const MESSAGE_LIMIT = 30;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const hasProcessedFirstMessage = useRef(false);
@@ -162,7 +163,16 @@ export default function ChatPage() {
     }
   }, [messages, sessionId, conversationTitle]);
 
+  const userMessageCount = messages.filter(m => m.role === 'user').length;
+  const isLimitReached = userMessageCount >= MESSAGE_LIMIT;
+
   const handleSendMessage = async (content: string) => {
+    // Message limit check
+    if (isLimitReached) {
+      showToast('Has alcanzado el límite de 30 mensajes. Inicia una nueva conversación.', 'error');
+      return;
+    }
+
     // Rate limiting: minimum 1 second between messages
     const now = Date.now();
     if (now - lastSendTime < 1000) {
@@ -647,6 +657,22 @@ export default function ChatPage() {
         </AnimatePresence>
       </motion.div>
 
+      {/* Limit Reached Banner */}
+      {isLimitReached && (
+        <div className="px-4 md:px-6 lg:px-10 pt-3 pb-0">
+          <div className="max-w-4xl mx-auto flex items-center gap-3 px-5 py-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+            <span>Has alcanzado el límite de 30 mensajes. Inicia una nueva conversación.</span>
+            <button
+              onClick={handleNewChat}
+              className="ml-auto text-xs font-semibold uppercase tracking-wider text-[#4DBDC9] hover:text-[#3A9BA6] transition-colors"
+            >
+              Nueva conversación
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Input Area - Alba style */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -658,9 +684,11 @@ export default function ChatPage() {
           <div
             className={`
               flex items-center gap-3 px-5 py-4 border transition-all duration-300
-              ${isFocused
-                ? 'border-[#4DBDC9] bg-white'
-                : 'border-gray-200 hover:border-gray-400'
+              ${isLimitReached
+                ? 'border-gray-200 bg-gray-50 opacity-60'
+                : isFocused
+                  ? 'border-[#4DBDC9] bg-white'
+                  : 'border-gray-200 hover:border-gray-400'
               }
             `}
           >
@@ -671,20 +699,25 @@ export default function ChatPage() {
               onKeyPress={handleKeyPress}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder="Escribe tu mensaje..."
-              disabled={isTyping}
+              placeholder={isLimitReached ? 'Límite de mensajes alcanzado' : 'Escribe tu mensaje...'}
+              disabled={isTyping || isLimitReached}
               aria-label="Mensaje para el asistente de nutrición"
               aria-describedby="input-hint"
               role="textbox"
               className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder:text-gray-400 text-base disabled:opacity-50"
             />
             <span id="input-hint" className="sr-only">
-              {isTyping ? 'Procesando mensaje, por favor espera' : 'Escribe tu pregunta y presiona Enter o el botón Enviar'}
+              {isLimitReached ? 'Límite de mensajes alcanzado' : isTyping ? 'Procesando mensaje, por favor espera' : 'Escribe tu pregunta y presiona Enter o el botón Enviar'}
+            </span>
+
+            {/* Message counter */}
+            <span className={`text-xs whitespace-nowrap ${isLimitReached ? 'text-amber-600 font-medium' : 'text-gray-400'}`}>
+              {userMessageCount}/{MESSAGE_LIMIT}
             </span>
 
             <button
               onClick={handleInputSend}
-              disabled={!inputValue.trim() || isTyping}
+              disabled={!inputValue.trim() || isTyping || isLimitReached}
               className="px-5 py-2.5 bg-[#4DBDC9] hover:bg-[#3A9BA6] text-black text-sm font-semibold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
               aria-label="Enviar mensaje"
             >
