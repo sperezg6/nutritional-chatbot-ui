@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Plus, Star, ArrowDown, Edit2, Loader2, Check, X, Send, ArrowLeft, AlertTriangle } from 'lucide-react';
@@ -38,6 +38,7 @@ export default function ChatPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [lastSendTime, setLastSendTime] = useState(0);
   const retryCountRef = useRef<Map<string, number>>(new Map());
+  const isSendingRef = useRef(false);
   const MAX_RETRIES = 3;
   const MESSAGE_LIMIT = 30;
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -53,7 +54,14 @@ export default function ChatPage() {
 
     const conversation = getFromStorage(sessionId);
     if (conversation) {
-      setMessages(conversation.messages as UIMessage[]);
+      // Deduplicate on load to prevent duplicate key errors
+      const seen = new Set<string>();
+      const deduped = (conversation.messages as UIMessage[]).filter(m => {
+        if (seen.has(m.id)) return false;
+        seen.add(m.id);
+        return true;
+      });
+      setMessages(deduped);
       setConversationTitle(conversation.title);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -148,28 +156,44 @@ export default function ChatPage() {
   }, []);
 
   // Save conversation whenever messages change
+  // Deduplicate messages by ID to prevent duplicate key errors
+  const uniqueMessages = useMemo(() => {
+    const seen = new Set<string>();
+    return messages.filter(m => {
+      if (seen.has(m.id)) return false;
+      seen.add(m.id);
+      return true;
+    });
+  }, [messages]);
+
+  // Save deduplicated conversation whenever messages change
   useEffect(() => {
     if (sessionId === 'new') return;
 
-    if (messages.length > 0) {
+    if (uniqueMessages.length > 0) {
       const conversation: Conversation = {
         id: sessionId,
         title: conversationTitle,
-        preview: messages[0]?.content.substring(0, 60) + '...',
+        preview: uniqueMessages[0]?.content.substring(0, 60) + '...',
         timestamp: new Date(),
-        messages,
+        messages: uniqueMessages,
       };
       saveToStorage(conversation);
     }
-  }, [messages, sessionId, conversationTitle]);
+  }, [uniqueMessages, sessionId, conversationTitle]);
 
-  const userMessageCount = messages.filter(m => m.role === 'user').length;
+  const userMessageCount = uniqueMessages.filter(m => m.role === 'user').length;
   const isLimitReached = userMessageCount >= MESSAGE_LIMIT;
 
   const handleSendMessage = async (content: string) => {
+    // Synchronous guard to prevent double-sends (state updates are batched)
+    if (isSendingRef.current) return;
+    isSendingRef.current = true;
+
     // Message limit check
     if (isLimitReached) {
       showToast('Has alcanzado el límite de 30 mensajes. Inicia una nueva conversación.', 'error');
+      isSendingRef.current = false;
       return;
     }
 
@@ -177,18 +201,19 @@ export default function ChatPage() {
     const now = Date.now();
     if (now - lastSendTime < 1000) {
       showToast('Por favor espera un momento antes de enviar otro mensaje', 'error');
+      isSendingRef.current = false;
       return;
     }
     setLastSendTime(now);
 
     const userMessage: UIMessage = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       role: 'user',
       content,
       timestamp: new Date(),
     };
 
-    const botMessageId = (Date.now() + 1).toString();
+    const botMessageId = crypto.randomUUID();
     let streamedContent = '';
     let newSessionId: string | null = null;
     let newTitle: string | null = null;
@@ -249,32 +274,32 @@ export default function ChatPage() {
         onComplete: (agentUsed) => {
           if (rafId) cancelAnimationFrame(rafId);
 
-          setMessages((prev) =>
-            prev.map((msg) =>
+          setMessages((prev) => {
+            const updated = prev.map((msg) =>
               msg.id === botMessageId
                 ? { ...msg, content: streamedContent }
                 : msg
-            )
-          );
+            );
+
+            // Save inside state updater to ensure we capture the final messages
+            if (sessionId === 'new' && newSessionId) {
+              const conversation: Conversation = {
+                id: newSessionId,
+                title: newTitle || conversationTitle,
+                preview: content.substring(0, 60) + '...',
+                timestamp: new Date(),
+                messages: updated,
+              };
+              saveToStorage(conversation);
+            }
+
+            return updated;
+          });
 
           setIsTyping(false);
+          isSendingRef.current = false;
 
           if (sessionId === 'new' && newSessionId) {
-            const finalBotMessage: UIMessage = {
-              id: botMessageId,
-              role: 'assistant',
-              content: streamedContent,
-              timestamp: new Date(),
-            };
-            const updatedMessages = [userMessage, finalBotMessage];
-            const conversation: Conversation = {
-              id: newSessionId,
-              title: newTitle || conversationTitle,
-              preview: content.substring(0, 60) + '...',
-              timestamp: new Date(),
-              messages: updatedMessages,
-            };
-            saveToStorage(conversation);
             router.replace(`/chat/${newSessionId}`, { scroll: false });
           }
         },
@@ -300,6 +325,7 @@ export default function ChatPage() {
             );
           }
           setIsTyping(false);
+          isSendingRef.current = false;
         },
       });
     } catch (error) {
@@ -324,6 +350,7 @@ export default function ChatPage() {
         );
       }
       setIsTyping(false);
+      isSendingRef.current = false;
     }
   };
 
@@ -600,11 +627,11 @@ export default function ChatPage() {
         />
 
         <div className="max-w-4xl mx-auto space-y-6 relative z-10">
-          {messages.length === 0 ? (
+          {uniqueMessages.length === 0 ? (
             <EmptyState onPromptClick={handleSendMessage} />
           ) : (
             <AnimatePresence mode="popLayout">
-              {messages.map((message, index) => (
+              {uniqueMessages.map((message, index) => (
                 <motion.div
                   key={message.id}
                   initial={{ opacity: 0, y: 10 }}
@@ -624,14 +651,14 @@ export default function ChatPage() {
           )}
 
           {/* Skeleton while loading */}
-          {isTyping && messages.length > 0 && messages[messages.length - 1]?.role === 'user' && (
+          {isTyping && uniqueMessages.length > 0 && uniqueMessages[uniqueMessages.length - 1]?.role === 'user' && (
             <MessageSkeleton lines={4} />
           )}
 
           {/* Follow-up suggestions */}
-          {!isTyping && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.isError && (
+          {!isTyping && uniqueMessages.length > 0 && uniqueMessages[uniqueMessages.length - 1]?.role === 'assistant' && !uniqueMessages[uniqueMessages.length - 1]?.isError && (
             <FollowUpSuggestions
-              suggestions={generateFollowUpSuggestions(messages[messages.length - 1].content)}
+              suggestions={generateFollowUpSuggestions(uniqueMessages[uniqueMessages.length - 1].content)}
               onSelect={handleSendMessage}
             />
           )}
