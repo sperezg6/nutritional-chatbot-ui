@@ -342,10 +342,12 @@ export function MealPlanPDF({ content }: MealPlanPDFProps) {
 
     // Helper to detect section headers (not inline bold text like **Ingredientes:**)
     const isSectionHeader = (line: string): boolean => {
-      if (line.startsWith('#')) return true;
+      // Strip leading emojis and whitespace so "🌅 **Desayuno**" is detected
+      const stripped = line.replace(/^[\s\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{FE00}-\u{FE0F}\u{200D}]+/gu, '');
+      if (stripped.startsWith('#')) return true;
       // Only treat ** as section header if it's a standalone bold title, not inline content
-      if (line.startsWith('**')) {
-        const lower = line.toLowerCase();
+      if (stripped.startsWith('**')) {
+        const lower = stripped.toLowerCase();
         // These are inline content, not section headers
         if (lower.includes('ingredientes:') || lower.includes('nutrición') || lower.includes('sodio')) {
           return false;
@@ -355,10 +357,25 @@ export function MealPlanPDF({ content }: MealPlanPDFProps) {
       return false;
     };
 
+    // Helper to ensure a default day exists
+    const ensureDay = () => {
+      if (!currentDay) {
+        currentDay = { name: 'Plan', meals: [] };
+        currentSection = 'meals';
+      }
+    };
+
+    // Helper to detect plain-text notes headers (no # or ** required)
+    const isNotesHeader = (lower: string): boolean => {
+      return /^(notas?\s+importantes?|recordatorio|recomendaciones?\s+generales?)/.test(lower);
+    };
+
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
+      const rawLine = lines[i];
+      const line = rawLine.trim();
       if (!line) continue;
 
+      const isIndented = /^\s{2,}/.test(rawLine);
       const cleanLine = cleanText(line);
       const lowerClean = cleanLine.toLowerCase();
 
@@ -382,16 +399,9 @@ export function MealPlanPDF({ content }: MealPlanPDFProps) {
       // Detect meal headers - support:
       // "#### Desayuno", "**Desayuno:**", "- **Desayuno**", "Desayuno:", "🌅 Desayuno"
       if (isMealHeader(cleanLine) && isSectionHeader(line)) {
-        // If no day exists yet, create a default "Día 1" for single-day plans
-        if (!currentDay) {
-          currentDay = {
-            name: 'Día 1',
-            meals: [],
-          };
-          currentSection = 'meals';
-        }
+        ensureDay();
         if (currentMeal) {
-          currentDay.meals.push(currentMeal);
+          currentDay!.meals.push(currentMeal);
         }
         currentMeal = {
           name: cleanLine.replace(/:$/, ''),
@@ -413,8 +423,11 @@ export function MealPlanPDF({ content }: MealPlanPDFProps) {
       else if (isSectionHeader(line) && (lowerClean.includes('límite') || lowerClean.includes('limite') || lowerClean.includes('recomendaciones nutricionales'))) {
         currentSection = 'limits';
       }
-      // Notes/Reminder section
-      else if (isSectionHeader(line) && (lowerClean.includes('recordatorio') || lowerClean.includes('nota') || lowerClean.includes('importante') || lowerClean.includes('recomendaciones generales'))) {
+      // Notes/Reminder section - support both markdown headers and plain text
+      else if (
+        (isSectionHeader(line) || isNotesHeader(lowerClean)) &&
+        (lowerClean.includes('recordatorio') || lowerClean.includes('nota') || lowerClean.includes('importante') || lowerClean.includes('recomendaciones generales'))
+      ) {
         if (currentDay) {
           if (currentMeal) currentDay.meals.push(currentMeal);
           plan.days.push(currentDay);
@@ -427,6 +440,37 @@ export function MealPlanPDF({ content }: MealPlanPDFProps) {
       // Week/Plan sections
       else if (isSectionHeader(line) && (lowerClean.includes('semana') || lowerClean.includes('menú'))) {
         currentSection = 'meals';
+      }
+      // Indented content (check raw line BEFORE trim) — belongs to current meal
+      else if (isIndented && currentMeal) {
+        const itemText = cleanText(line);
+        const lowerItem = itemText.toLowerCase();
+        if (!itemText) continue;
+
+        // Nutrition line or sub-items like "- Calorías: 250 kcal"
+        if (lowerItem.includes('calorías') || lowerItem.includes('kcal') || lowerItem.includes('sodio') || lowerItem.includes('potasio') || lowerItem.includes('fósforo') || lowerItem.includes('proteína')) {
+          // Aggregate nutrition items into one string
+          const nutritionLine = itemText.replace(/^[-*]\s*/, '');
+          currentMeal.nutrition = currentMeal.nutrition
+            ? `${currentMeal.nutrition} | ${nutritionLine}`
+            : nutritionLine;
+        }
+        // Skip "Nutrición aproximada:" label line
+        else if (lowerItem.includes('nutrición aproximada') || lowerItem === 'nutrición:') {
+          continue;
+        }
+        // Ingredientes, Preparación, etc. — extract content after label
+        else if (lowerItem.startsWith('ingredientes:')) {
+          const content = itemText.substring('ingredientes:'.length).trim();
+          if (content) currentMeal.items.push(`Ingredientes: ${content}`);
+        }
+        else if (lowerItem.startsWith('preparación:') || lowerItem.startsWith('preparacion:')) {
+          const content = itemText.substring(itemText.indexOf(':') + 1).trim();
+          if (content) currentMeal.items.push(`Preparación: ${content}`);
+        }
+        else if (itemText.length > 3) {
+          currentMeal.items.push(itemText);
+        }
       }
       // List items (starting with - or *)
       else if (/^[-*]\s/.test(line)) {
@@ -454,6 +498,22 @@ export function MealPlanPDF({ content }: MealPlanPDFProps) {
         else if (currentSection === 'notes' || inNotes) {
           plan.notes.push(itemText);
         }
+        // Check meal header BEFORE adding to currentMeal so "- Desayuno 2:" creates a new meal
+        else if (isMealHeader(itemText)) {
+          ensureDay();
+          if (currentMeal) {
+            currentDay!.meals.push(currentMeal);
+          }
+          // Split "Desayuno 1: Description" into name + first item
+          const colonIdx = itemText.indexOf(':');
+          if (colonIdx > 0) {
+            const namePart = itemText.substring(0, colonIdx).trim();
+            const descPart = itemText.substring(colonIdx + 1).trim();
+            currentMeal = { name: namePart, items: descPart ? [descPart] : [] };
+          } else {
+            currentMeal = { name: itemText.replace(/:$/, ''), items: [] };
+          }
+        }
         else if (currentMeal) {
           // Add item to current meal
           if (lowerItem.includes('nutrición') || lowerItem.includes('sodio') || lowerItem.includes('kcal')) {
@@ -462,19 +522,9 @@ export function MealPlanPDF({ content }: MealPlanPDFProps) {
             currentMeal.items.push(itemText);
           }
         }
-        else if (currentDay && isMealHeader(itemText)) {
-          // Meal name as list item
-          if (currentMeal) {
-            currentDay.meals.push(currentMeal);
-          }
-          currentMeal = {
-            name: itemText.replace(/:$/, ''),
-            items: [],
-          };
-        }
       }
-      // Nested list items or indented content
-      else if (/^\s+[-*]\s/.test(line) || /^\s{2,}/.test(line)) {
+      // Nested list items or indented content (fallback for other indentation patterns)
+      else if (/^\s+[-*]\s/.test(rawLine) || /^\s{2,}/.test(rawLine)) {
         const itemText = cleanText(line);
         const lowerItem = itemText.toLowerCase();
         if (currentMeal && itemText) {
@@ -496,20 +546,12 @@ export function MealPlanPDF({ content }: MealPlanPDFProps) {
       else if (currentMeal && !isSectionHeader(line) && cleanLine) {
         // Handle inline ingredients and nutrition
         const lowerLine = cleanLine.toLowerCase();
-        if (lowerLine.includes('ingredientes:') || lowerLine.includes('nutrición')) {
-          // Parse inline content with bold markers
-          const parts = cleanLine.split(/\*\*/).filter(p => p.trim());
-          for (const part of parts) {
-            const trimmed = part.trim();
-            if (trimmed.toLowerCase().includes('nutrición') || trimmed.toLowerCase().includes('sodio')) {
-              currentMeal.nutrition = trimmed.replace(/^[:\s]+/, '');
-            } else if (trimmed.toLowerCase().includes('ingredientes')) {
-              // Skip the label "Ingredientes:"
-              continue;
-            } else if (trimmed.length > 5) {
-              currentMeal.items.push(trimmed.replace(/^[:\s]+/, ''));
-            }
-          }
+        if (lowerLine.includes('ingredientes:')) {
+          const content = cleanLine.substring(cleanLine.toLowerCase().indexOf('ingredientes:') + 'ingredientes:'.length).trim();
+          if (content) currentMeal.items.push(`Ingredientes: ${content}`);
+        }
+        else if (lowerLine.includes('nutrición') || lowerLine.includes('sodio')) {
+          currentMeal.nutrition = cleanLine;
         }
         // Skip lines that look like headers or are very short
         else if (cleanLine.length > 5 && !cleanLine.endsWith(':')) {
