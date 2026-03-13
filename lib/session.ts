@@ -148,7 +148,7 @@ export function updateConversationTitle(id: string, title: string): void {
 }
 
 /**
- * Update conversation title in the database (Supabase)
+ * Update conversation title in the database (DynamoDB)
  * This should be called after updateConversationTitle to sync with backend
  */
 export async function updateConversationTitleInDB(

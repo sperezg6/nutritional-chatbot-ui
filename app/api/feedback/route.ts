@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { PutCommand } from '@aws-sdk/lib-dynamodb';
+import { docClient, FEEDBACK_TABLE } from '@/lib/dynamodb';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 
 // Helper to validate UUID format
@@ -53,45 +54,27 @@ export async function POST(request: NextRequest) {
                       request.headers.get('x-real-ip') ||
                       undefined;
 
-    // Prepare feedback data
-    // Only include session_id if it's a valid UUID (not "welcome-screen" or other invalid values)
     const validSessionId = session_id && isValidUUID(session_id) ? session_id : null;
+    const now = new Date().toISOString();
+    const datePartition = now.slice(0, 10); // YYYY-MM-DD
 
-    const feedbackData: any = {
+    const item: Record<string, unknown> = {
+      session_id: validSessionId || `no-session-${now}`,
+      created_at: now,
+      date_partition: datePartition,
       rating,
     };
 
-    // Only add session_id if it's valid
-    if (validSessionId) {
-      feedbackData.session_id = validSessionId;
-    }
+    if (comment) item.comment = comment;
+    if (userAgent) item.user_agent = userAgent;
+    if (ipAddress) item.ip_address = ipAddress;
 
-    if (comment) {
-      feedbackData.comment = comment;
-    }
-    if (userAgent) {
-      feedbackData.user_agent = userAgent;
-    }
-    if (ipAddress) {
-      feedbackData.ip_address = ipAddress;
-    }
+    await docClient.send(new PutCommand({
+      TableName: FEEDBACK_TABLE,
+      Item: item,
+    }));
 
-    // Save feedback to Supabase
-    const { data, error } = await supabase
-      .from('session_feedback')
-      .insert(feedbackData)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Supabase error:', error);
-      return NextResponse.json(
-        { error: 'Failed to save feedback' },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ success: true, data: item });
   } catch (error) {
     console.error('Error saving feedback:', error);
     return NextResponse.json(

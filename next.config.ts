@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob:",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co https://*.amazonaws.com https://*.on.aws",
+              "connect-src 'self' https://*.amazonaws.com https://*.on.aws",
               "frame-ancestors 'none'",
             ].join('; '),
           },

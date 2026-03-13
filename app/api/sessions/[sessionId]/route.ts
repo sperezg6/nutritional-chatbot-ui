@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import { docClient, SESSIONS_TABLE } from '@/lib/dynamodb';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 
 // Helper to validate UUID format
@@ -63,39 +64,41 @@ export async function PATCH(
       );
     }
 
-    // Update the session title in Supabase
-    const { data, error } = await supabase
-      .from('sessions')
-      .update({ title: trimmedTitle })
-      .eq('id', sessionId)
-      .select()
-      .single();
+    // Update the session title in DynamoDB
+    const result = await docClient.send(new UpdateCommand({
+      TableName: SESSIONS_TABLE,
+      Key: { session_id: sessionId },
+      UpdateExpression: 'SET title = :title, updated_at = :now',
+      ExpressionAttributeValues: {
+        ':title': trimmedTitle,
+        ':now': new Date().toISOString(),
+      },
+      ConditionExpression: 'attribute_exists(session_id)',
+      ReturnValues: 'ALL_NEW',
+    }));
 
-    if (error) {
-      console.error('Supabase error updating session title:', error);
-
-      // Sanitize error responses — don't expose Supabase internals
-      if (error.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Session not found' },
-          { status: 404 }
-        );
-      }
-
+    const updated = result.Attributes;
+    if (!updated) {
       return NextResponse.json(
-        { error: 'Failed to update session title' },
-        { status: 500 }
+        { error: 'Session not found' },
+        { status: 404 }
       );
     }
 
     return NextResponse.json({
       success: true,
       data: {
-        id: data.id,
-        title: data.title
+        id: updated.session_id,
+        title: updated.title
       }
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.name === 'ConditionalCheckFailedException') {
+      return NextResponse.json(
+        { error: 'Session not found' },
+        { status: 404 }
+      );
+    }
     console.error('Error updating session:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
