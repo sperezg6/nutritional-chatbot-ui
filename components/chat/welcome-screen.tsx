@@ -1,12 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, ArrowUpRight } from 'lucide-react';
-import dynamic from 'next/dynamic';
-
-const FlowFieldBackground = dynamic(() => import('@/components/ui/flow-field-background'), { ssr: false });
-
 // Hook to detect mobile viewport
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -85,6 +81,26 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
   const [isFocused, setIsFocused] = useState(false);
   const isMobile = useIsMobile();
 
+  const [waterPos, setWaterPos] = useState({ x: 50, y: 50 });
+  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+  const lastRippleTime = useRef(0);
+  const rippleIdRef = useRef(0);
+
+  const handleWaterMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setWaterPos({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    });
+    const now = Date.now();
+    if (now - lastRippleTime.current > 400) {
+      lastRippleTime.current = now;
+      const id = rippleIdRef.current++;
+      setRipples(prev => [...prev, { id, x: e.clientX - rect.left, y: e.clientY - rect.top }]);
+      setTimeout(() => setRipples(prev => prev.filter(r => r.id !== id)), 1400);
+    }
+  }, []);
+
   // Track current prompt index for each position (4 on mobile, 6 on desktop)
   const [promptIndices, setPromptIndices] = useState<number[]>([0, 5, 11, 16, 22, 27]);
 
@@ -151,13 +167,27 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
       initial="initial"
       animate={isExiting ? "exit" : "animate"}
       exit="exit"
-      className="min-h-screen bg-[#FAFAF7] flex flex-col px-6 md:px-12 lg:px-16 pt-24 pb-12 relative overflow-hidden"
+      className="min-h-screen bg-transparent flex flex-col px-6 md:px-12 lg:px-16 pt-24 pb-12 relative overflow-hidden"
+      onMouseMove={handleWaterMouseMove}
     >
-      {/* Flow field animation background */}
-      <FlowFieldBackground particleCount={150} speed={0.5} trailOpacity={0.15} />
-
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#FAFAF7]/50 pointer-events-none" />
+
+      {/* Water glow overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none z-10"
+        style={{
+          background: `radial-gradient(circle 500px at ${waterPos.x}% ${waterPos.y}%, rgba(245,159,32,0.07) 0%, transparent 70%)`,
+        }}
+      />
+      {/* Ripple rings */}
+      {ripples.map(r => (
+        <div
+          key={r.id}
+          className="water-ripple absolute pointer-events-none z-10 rounded-full border border-[#F59F20]/20"
+          style={{ left: r.x, top: r.y, transform: 'translate(-50%, -50%)' }}
+        />
+      ))}
 
       {/* Main content */}
       <div className="max-w-4xl mx-auto w-full relative z-10 flex-1 flex flex-col">
@@ -172,9 +202,9 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
         >
           {/* Section indicator */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-2 h-2 rounded-full bg-[#4DBDC9]" />
+            <div className="w-2 h-2 rounded-full bg-[#F59F20]" />
             <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">
-              Asistente Nutricional
+              Asistente Alba
             </span>
           </div>
 
@@ -182,11 +212,11 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-light text-gray-900 leading-tight mb-4">
             Hola, ¿en qué puedo
             <br />
-            <span className="text-[#4DBDC9]">asistirte</span> hoy?
+            <span className="text-[#F59F20]">asistirte</span> hoy?
           </h1>
 
           <p className="text-lg text-gray-500 max-w-xl">
-            Tu guía personalizada de nutrición renal. Pregunta sobre dietas, alimentos permitidos y recomendaciones.
+            Tu asistente personal de Alba. Pregunta sobre tratamientos, sucursales, nutrición y cuidado renal.
           </p>
         </motion.div>
 
@@ -223,13 +253,13 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
                         ease: [0.4, 0.0, 0.2, 1]
                       }}
                       onClick={() => handlePromptClick(prompt)}
-                      className="absolute inset-0 w-full text-left px-5 py-4 border border-gray-200 hover:border-[#4DBDC9]/50 hover:bg-gray-50 transition-all duration-300 group"
+                      className="absolute inset-0 w-full text-left px-5 py-4 border border-gray-200 hover:border-[#F59F20]/50 hover:bg-gray-50 transition-all duration-300 group rounded-xl"
                     >
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-sm md:text-base text-gray-600 group-hover:text-gray-900 transition-colors">
                           {prompt}
                         </span>
-                        <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover:text-[#4DBDC9] transition-colors flex-shrink-0" />
+                        <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover:text-[#F59F20] transition-colors flex-shrink-0" />
                       </div>
                     </motion.button>
                   </AnimatePresence>
@@ -257,9 +287,9 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
 
           <div
             className={`
-              flex items-center gap-3 px-5 py-4 border transition-all duration-300
+              flex items-center gap-3 px-5 py-4 border transition-all duration-300 rounded-xl
               ${isFocused
-                ? 'border-[#4DBDC9] bg-white'
+                ? 'border-[#F59F20] bg-white'
                 : 'border-gray-200 hover:border-gray-400'
               }
             `}
@@ -271,14 +301,14 @@ export function WelcomeScreen({ onPromptClick, isExiting = false }: WelcomeScree
               onKeyPress={handleKeyPress}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder={isMobile ? "Escribe tu pregunta..." : "Escribe tu pregunta sobre nutrición renal aquí..."}
+              placeholder={isMobile ? "Escribe tu pregunta..." : "Escribe tu pregunta sobre Alba, tratamientos o nutrición renal..."}
               className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder:text-gray-400 text-base"
             />
 
             <button
               onClick={handleSend}
               disabled={!input.trim()}
-              className="px-5 py-2.5 bg-[#4DBDC9] hover:bg-[#3A9BA6] text-black text-sm font-semibold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#F59F20] hover:bg-[#D88A15] text-black text-sm font-semibold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2 rounded-xl"
               aria-label="Enviar mensaje"
             >
               <span className="hidden sm:inline">Enviar</span>

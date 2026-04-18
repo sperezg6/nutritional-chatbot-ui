@@ -159,12 +159,12 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
         <div className={`w-8 h-8 flex items-center justify-center flex-shrink-0 ${
           isError
             ? 'border border-red-500/30 bg-red-500/10'
-            : 'border border-[#4DBDC9]/30 bg-[#4DBDC9]/10'
+            : 'border border-[#F59F20]/30 bg-[#F59F20]/10'
         }`}>
           {isError ? (
             <AlertCircle className="w-4 h-4 text-red-400" />
           ) : (
-            <Leaf className="w-4 h-4 text-[#4DBDC9]" />
+            <Leaf className="w-4 h-4 text-[#F59F20]" />
           )}
         </div>
       )}
@@ -174,10 +174,10 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
         <div
           className={`
             ${isUser
-              ? 'bg-[#4DBDC9] text-black'
+              ? 'bg-[#F59F20] text-black rounded-2xl rounded-tr-sm'
               : isError
-              ? 'bg-red-500/10 border border-red-500/30'
-              : 'bg-white border border-gray-200'
+              ? 'bg-red-500/10 border border-red-500/30 rounded-2xl rounded-tl-sm'
+              : 'bg-white border border-gray-200 rounded-2xl rounded-tl-sm'
             }
             px-5 py-4
           `}
@@ -202,7 +202,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                   prose-li:my-0.5 prose-li:leading-relaxed prose-li:pl-0
                   prose-hr:my-6 prose-hr:border-gray-200
                   prose-strong:text-gray-900 prose-strong:font-medium
-                  prose-a:text-[#4DBDC9] prose-a:no-underline hover:prose-a:underline
+                  prose-a:text-[#F59F20] prose-a:no-underline hover:prose-a:underline
                 `}
               />
 
@@ -213,7 +213,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                   {isLongContent && onExpand && (
                     <button
                       onClick={handleExpand}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#4DBDC9] hover:bg-[#3A9BA6] transition-all"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#F59F20] hover:bg-[#D88A15] transition-all"
                       aria-label="Expandir en panel lateral"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
@@ -254,7 +254,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                     onClick={handleBookmark}
                     className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all ${
                       isBookmarked
-                        ? 'text-[#4DBDC9] bg-[#4DBDC9]/10 border border-[#4DBDC9]/30'
+                        ? 'text-[#F59F20] bg-[#F59F20]/10 border border-[#F59F20]/30'
                         : 'text-gray-500 bg-gray-50 border border-gray-200 hover:border-gray-300 hover:text-gray-900'
                     }`}
                     aria-label={isBookmarked ? "Quitar de guardados" : "Guardar mensaje"}
@@ -272,7 +272,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
                     <button
                       onClick={handleDownloadPDF}
                       disabled={isDownloading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#4DBDC9] hover:bg-[#3A9BA6] disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-wider"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-black bg-[#F59F20] hover:bg-[#D88A15] disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-wider"
                       aria-label={isDownloading ? "Generando PDF..." : "Descargar PDF"}
                       aria-busy={isDownloading}
                     >
@@ -318,7 +318,7 @@ export const ChatMessage = memo(function ChatMessage({ message, index, onRetry, 
 
       {/* User Avatar - Alba style */}
       {isUser && (
-        <div className="w-8 h-8 border border-[#4DBDC9]/30 bg-[#4DBDC9] flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 border border-[#F59F20]/30 bg-[#F59F20] flex items-center justify-center flex-shrink-0">
           <User className="w-4 h-4 text-black" />
         </div>
       )}

@@ -49,7 +49,7 @@ export function EmptyState({ onPromptClick }: EmptyStateProps) {
         transition={{ delay: 0.1 }}
         className="flex items-center gap-3 mb-8"
       >
-        <div className="w-2 h-2 rounded-full bg-[#4DBDC9]" />
+        <div className="w-2 h-2 rounded-full bg-[#F59F20]" />
         <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
           Nueva conversación
         </span>
@@ -72,8 +72,8 @@ export function EmptyState({ onPromptClick }: EmptyStateProps) {
         transition={{ delay: 0.3 }}
         className="text-sm text-gray-500 mb-10 text-center max-w-md"
       >
-        Soy tu asistente de nutrición renal. Puedo ayudarte con planes de comidas,
-        interpretar resultados de laboratorio y responder tus preguntas sobre alimentación.
+        Soy el asistente personal de Alba. Puedo ayudarte con tratamientos, sucursales,
+        nutrición renal y responder tus preguntas sobre cuidado de los riñones.
       </motion.p>
 
       {/* Tips Grid - Alba style */}
@@ -85,17 +85,17 @@ export function EmptyState({ onPromptClick }: EmptyStateProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 + index * 0.1 }}
             onClick={() => onPromptClick(tip.prompt)}
-            className="group flex items-start gap-4 p-5 border border-gray-200 hover:border-[#4DBDC9]/50 hover:bg-gray-50 transition-all duration-300 text-left"
+            className="group flex items-start gap-4 p-5 border border-gray-200 hover:border-[#F59F20]/50 hover:bg-gray-50 transition-all duration-300 text-left"
           >
-            <div className="w-10 h-10 border border-gray-200 group-hover:border-[#4DBDC9]/30 bg-gray-50 group-hover:bg-[#4DBDC9]/10 flex items-center justify-center flex-shrink-0 transition-all">
-              <tip.icon className="w-5 h-5 text-gray-500 group-hover:text-[#4DBDC9] transition-colors" />
+            <div className="w-10 h-10 border border-gray-200 group-hover:border-[#F59F20]/30 bg-gray-50 group-hover:bg-[#F59F20]/10 flex items-center justify-center flex-shrink-0 transition-all">
+              <tip.icon className="w-5 h-5 text-gray-500 group-hover:text-[#F59F20] transition-colors" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="font-medium text-gray-700 group-hover:text-gray-900 text-sm transition-colors">
                   {tip.title}
                 </h3>
-                <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover:text-[#4DBDC9] transition-colors flex-shrink-0" />
+                <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover:text-[#F59F20] transition-colors flex-shrink-0" />
               </div>
               <p className="text-xs text-gray-400 mt-1">
                 {tip.description}

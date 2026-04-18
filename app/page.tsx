@@ -43,7 +43,7 @@ export default function Home() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#FAFAF7]">
+    <div className="relative min-h-screen" style={{ background: 'linear-gradient(135deg, rgba(77,189,201,0.20) 0%, #FAFAF7 48%, rgba(245,159,32,0.48) 100%)' }}>
       {/* Alba-style Minimal Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
@@ -75,7 +75,7 @@ export default function Home() {
           {/* Right - Feedback */}
           <button
             onClick={() => setIsFeedbackOpen(true)}
-            className="flex items-center gap-2 text-gray-500 hover:text-[#4DBDC9] transition-colors"
+            className="flex items-center gap-2 text-gray-500 hover:text-[#F59F20] transition-colors"
             aria-label="Dar feedback"
           >
             <Star className="w-5 h-5" />
@@ -94,7 +94,7 @@ export default function Home() {
         >
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-2 h-2 rounded-full bg-[#4DBDC9]" />
+              <div className="w-2 h-2 rounded-full bg-[#F59F20]" />
               <span className="text-xs font-medium text-white/50 uppercase tracking-wider">
                 Aviso Importante
               </span>
@@ -112,7 +112,7 @@ export default function Home() {
           <DialogFooter className="mt-6">
             <Button
               onClick={handleDisclaimerClose}
-              className="w-full bg-[#4DBDC9] hover:bg-[#3A9BA6] text-black font-semibold uppercase tracking-wider"
+              className="w-full bg-[#F59F20] hover:bg-[#D88A15] text-black font-semibold uppercase tracking-wider"
             >
               Entendido
             </Button>

@@ -39,6 +39,26 @@ export default function ChatPage() {
   const [lastSendTime, setLastSendTime] = useState(0);
   const retryCountRef = useRef<Map<string, number>>(new Map());
   const isSendingRef = useRef(false);
+
+  const [waterPos, setWaterPos] = useState({ x: 50, y: 50 });
+  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+  const lastRippleTime = useRef(0);
+  const rippleIdRef = useRef(0);
+
+  const handleWaterMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setWaterPos({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    });
+    const now = Date.now();
+    if (now - lastRippleTime.current > 400) {
+      lastRippleTime.current = now;
+      const id = rippleIdRef.current++;
+      setRipples(prev => [...prev, { id, x: e.clientX - rect.left, y: e.clientY - rect.top }]);
+      setTimeout(() => setRipples(prev => prev.filter(r => r.id !== id)), 1400);
+    }
+  }, []);
   const MAX_RETRIES = 3;
   const MESSAGE_LIMIT = 30;
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -510,13 +530,23 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] flex flex-col">
+    <div className="min-h-screen bg-[#FAFAF7] flex flex-col relative overflow-hidden">
+      {/* Brand gradient blobs */}
+      <div
+        className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full opacity-[0.18] blur-3xl pointer-events-none z-0"
+        style={{ background: 'radial-gradient(circle, #F59F20 0%, transparent 65%)' }}
+      />
+      <div
+        className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full opacity-[0.15] blur-3xl pointer-events-none z-0"
+        style={{ background: 'radial-gradient(circle, #4DBDC9 0%, transparent 65%)' }}
+      />
+
       {/* Alba-style Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="border-b border-gray-200 px-4 md:px-6 lg:px-10 py-4"
+        className="relative z-10 border-b border-gray-200 px-4 md:px-6 lg:px-10 py-4 bg-[#FAFAF7]/80 backdrop-blur-sm"
       >
         <div className="max-w-6xl mx-auto flex items-center gap-3">
           {/* Back/Home */}
@@ -553,12 +583,12 @@ export default function ChatPage() {
                     if (e.key === 'Enter') handleSaveTitle();
                     else if (e.key === 'Escape') handleCancelEditTitle();
                   }}
-                  className="flex-1 text-sm font-medium text-gray-900 bg-gray-100 border border-[#4DBDC9]/50 px-3 py-1.5 focus:outline-none focus:border-[#4DBDC9]"
+                  className="flex-1 text-sm font-medium text-gray-900 bg-gray-100 border border-[#F59F20]/50 px-3 py-1.5 focus:outline-none focus:border-[#F59F20]"
                   maxLength={255}
                 />
                 <button
                   onClick={handleSaveTitle}
-                  className="p-1.5 text-[#4DBDC9] hover:bg-[#4DBDC9]/10 transition-colors"
+                  className="p-1.5 text-[#F59F20] hover:bg-[#F59F20]/10 transition-colors"
                   aria-label="Guardar título"
                 >
                   <Check className="w-4 h-4" />
@@ -582,7 +612,7 @@ export default function ChatPage() {
                   {conversationTitle}
                 </h1>
                 {isSavingTitle ? (
-                  <Loader2 className="w-3 h-3 animate-spin text-[#4DBDC9] flex-shrink-0" />
+                  <Loader2 className="w-3 h-3 animate-spin text-[#F59F20] flex-shrink-0" />
                 ) : sessionId !== 'new' && (
                   <Edit2 className="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                 )}
@@ -593,14 +623,14 @@ export default function ChatPage() {
           {/* Right side - Actions */}
           <button
             onClick={handleNewChat}
-            className="p-2 text-[#4DBDC9] hover:bg-[#4DBDC9]/10 transition-colors"
+            className="p-2 text-[#F59F20] hover:bg-[#F59F20]/10 transition-colors"
             aria-label="Nueva conversación"
           >
             <Plus className="w-5 h-5" />
           </button>
           <button
             onClick={() => setIsFeedbackOpen(true)}
-            className="p-2 text-gray-500 hover:text-[#4DBDC9] hover:bg-[#4DBDC9]/10 transition-colors"
+            className="p-2 text-gray-500 hover:text-[#F59F20] hover:bg-[#F59F20]/10 transition-colors"
             aria-label="Dar feedback"
           >
             <Star className="w-5 h-5" />
@@ -614,17 +644,24 @@ export default function ChatPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        className="flex-1 overflow-y-auto px-4 md:px-6 py-6 relative"
+        className="flex-1 overflow-y-auto px-4 md:px-6 py-6 relative z-10"
+        onMouseMove={handleWaterMouseMove}
       >
-        {/* Decorative gradient blobs */}
+        {/* Water glow overlay */}
         <div
-          className="absolute -top-32 -right-32 w-[500px] h-[500px] opacity-20 pointer-events-none"
-          style={{ backgroundImage: 'url(/gradient-blob.png)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }}
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{
+            background: `radial-gradient(circle 500px at ${waterPos.x}% ${waterPos.y}%, rgba(245,159,32,0.06) 0%, transparent 70%)`,
+          }}
         />
-        <div
-          className="absolute -bottom-32 -left-32 w-[400px] h-[400px] opacity-15 pointer-events-none rotate-180"
-          style={{ backgroundImage: 'url(/gradient-blob.png)', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }}
-        />
+        {/* Ripple rings */}
+        {ripples.map(r => (
+          <div
+            key={r.id}
+            className="water-ripple absolute pointer-events-none z-0 rounded-full border border-[#F59F20]/20"
+            style={{ left: r.x, top: r.y, transform: 'translate(-50%, -50%)' }}
+          />
+        ))}
 
         <div className="max-w-4xl mx-auto space-y-6 relative z-10">
           {uniqueMessages.length === 0 ? (
@@ -675,7 +712,7 @@ export default function ChatPage() {
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.2 }}
               onClick={scrollToBottom}
-              className="absolute bottom-4 right-4 p-3 bg-gray-100 border border-gray-200 hover:border-[#4DBDC9]/50 hover:bg-gray-50 transition-all"
+              className="absolute bottom-4 right-4 p-3 bg-gray-100 border border-gray-200 hover:border-[#F59F20]/50 hover:bg-gray-50 transition-all"
               aria-label="Ir al final"
             >
               <ArrowDown className="w-5 h-5 text-gray-500" />
@@ -692,7 +729,7 @@ export default function ChatPage() {
             <span>Has alcanzado el límite de 30 mensajes. Inicia una nueva conversación.</span>
             <button
               onClick={handleNewChat}
-              className="ml-auto text-xs font-semibold uppercase tracking-wider text-[#4DBDC9] hover:text-[#3A9BA6] transition-colors"
+              className="ml-auto text-xs font-semibold uppercase tracking-wider text-[#F59F20] hover:text-[#D88A15] transition-colors"
             >
               Nueva conversación
             </button>
@@ -705,16 +742,16 @@ export default function ChatPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
-        className="border-t border-gray-200 px-4 md:px-6 lg:px-10 py-4"
+        className="relative z-10 border-t border-gray-200 px-4 md:px-6 lg:px-10 py-4 bg-[#FAFAF7]/80 backdrop-blur-sm"
       >
         <div className="max-w-4xl mx-auto">
           <div
             className={`
-              flex items-center gap-3 px-5 py-4 border transition-all duration-300
+              flex items-center gap-3 px-5 py-4 border transition-all duration-300 rounded-xl
               ${isLimitReached
                 ? 'border-gray-200 bg-gray-50 opacity-60'
                 : isFocused
-                  ? 'border-[#4DBDC9] bg-white'
+                  ? 'border-[#F59F20] bg-white'
                   : 'border-gray-200 hover:border-gray-400'
               }
             `}
@@ -728,7 +765,7 @@ export default function ChatPage() {
               onBlur={() => setIsFocused(false)}
               placeholder={isLimitReached ? 'Límite de mensajes alcanzado' : 'Escribe tu mensaje...'}
               disabled={isTyping || isLimitReached}
-              aria-label="Mensaje para el asistente de nutrición"
+              aria-label="Mensaje para el asistente Alba"
               aria-describedby="input-hint"
               role="textbox"
               className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder:text-gray-400 text-base disabled:opacity-50"
@@ -745,7 +782,7 @@ export default function ChatPage() {
             <button
               onClick={handleInputSend}
               disabled={!inputValue.trim() || isTyping || isLimitReached}
-              className="px-5 py-2.5 bg-[#4DBDC9] hover:bg-[#3A9BA6] text-black text-sm font-semibold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#F59F20] hover:bg-[#D88A15] text-black text-sm font-semibold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2 rounded-xl"
               aria-label="Enviar mensaje"
             >
               <span className="hidden sm:inline">Enviar</span>

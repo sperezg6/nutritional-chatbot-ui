@@ -102,8 +102,8 @@ export function ContentPanel({
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 flex items-center justify-center bg-[#4DBDC9]/10 border border-[#4DBDC9]/30">
-                  <Maximize2 className="w-4 h-4 text-[#4DBDC9]" />
+                <div className="w-8 h-8 flex items-center justify-center bg-[#F59F20]/10 border border-[#F59F20]/30">
+                  <Maximize2 className="w-4 h-4 text-[#F59F20]" />
                 </div>
                 <h2 className="text-sm font-medium text-gray-900 truncate max-w-[200px] sm:max-w-[300px]">
                   {title}
@@ -133,7 +133,7 @@ export function ContentPanel({
                 {isMealPlan && onDownloadPDF && (
                   <button
                     onClick={onDownloadPDF}
-                    className="p-2 text-[#4DBDC9] hover:bg-[#4DBDC9]/10 transition-all"
+                    className="p-2 text-[#F59F20] hover:bg-[#F59F20]/10 transition-all"
                     aria-label="Descargar PDF"
                     title="Descargar PDF"
                   >
@@ -175,8 +175,8 @@ export function ContentPanel({
                     prose-li:my-1 prose-li:leading-relaxed prose-li:pl-0 prose-li:text-[15px]
                     prose-hr:my-8 prose-hr:border-gray-200
                     prose-strong:text-gray-900 prose-strong:font-medium
-                    prose-a:text-[#4DBDC9] prose-a:no-underline hover:prose-a:underline
-                    prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[#4DBDC9]
+                    prose-a:text-[#F59F20] prose-a:no-underline hover:prose-a:underline
+                    prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[#F59F20]
                     prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200
                     prose-table:border-collapse
                     prose-th:border prose-th:border-gray-300 prose-th:px-3 prose-th:py-2 prose-th:bg-gray-50
@@ -194,7 +194,7 @@ export function ContentPanel({
               {isMealPlan && onDownloadPDF && (
                 <button
                   onClick={onDownloadPDF}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#4DBDC9] hover:bg-[#3A9BA6] text-black text-xs font-semibold uppercase tracking-wider transition-all"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#F59F20] hover:bg-[#D88A15] text-black text-xs font-semibold uppercase tracking-wider transition-all"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Descargar PDF</span>

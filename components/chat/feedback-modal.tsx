@@ -84,7 +84,7 @@ export function FeedbackModal({ isOpen, onClose, conversationId }: FeedbackModal
                 ¿Cómo fue tu experiencia?
               </DialogTitle>
               <DialogDescription className="text-center text-base text-[var(--color-muted)] dark:text-gray-400">
-                Tu retroalimentación nos ayuda a mejorar el asistente de nutrición
+                Tu retroalimentación nos ayuda a mejorar el asistente Alba
               </DialogDescription>
             </DialogHeader>
 

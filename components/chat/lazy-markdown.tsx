@@ -69,7 +69,7 @@ const markdownComponents = {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-[#4DBDC9] hover:text-[#3A9BA6] underline font-medium"
+      className="text-[#F59F20] hover:text-[#D88A15] underline font-medium"
       {...props}
     >
       {children}

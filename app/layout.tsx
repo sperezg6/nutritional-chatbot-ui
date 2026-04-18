@@ -19,9 +19,9 @@ const cardo = Cardo({
 })
 
 export const metadata: Metadata = {
-  title: "Asistente de Nutrición Renal",
-  description: "Tu asistente de nutrición personalizado para el manejo de la enfermedad renal",
-  themeColor: "#4DBDC9",
+  title: "Asistente Alba",
+  description: "Tu asistente personal de Alba Diálisis. Información sobre tratamientos, sucursales, nutrición y cuidado renal.",
+  themeColor: "#F59F20",
   other: {
     "apple-mobile-web-app-status-bar-style": "black-translucent",
   },
