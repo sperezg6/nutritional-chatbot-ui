@@ -45,17 +45,17 @@
     --color-muted: #6B7280;
     --color-border: #E5E7EB;
 
-    /* Medical aqua palette */
-    --medical-50: #E0F4F7;
-    --medical-100: #B3E5EC;
-    --medical-200: #80D4E0;
-    --medical-300: #4DC3D4;
-    --medical-400: #4DBDC9;
-    --medical-500: #3A9BA6;
-    --medical-600: #2E7D85;
-    --medical-700: #225F65;
-    --medical-800: #174246;
-    --medical-900: #0C2528;
+    /* Alba Orange palette — used for focus rings and interactive states */
+    --medical-50: #FFF8E7;
+    --medical-100: #FEEFC3;
+    --medical-200: #FDE49A;
+    --medical-300: #FDD070;
+    --medical-400: #F59F20;
+    --medical-500: #D88A15;
+    --medical-600: #B87210;
+    --medical-700: #8A570C;
+    --medical-800: #5C3B08;
+    --medical-900: #2E1E04;
   }
 
   .dark {
